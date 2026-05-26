@@ -12,8 +12,14 @@ var http = require('http');
  * Get port from environment and store in Express.
  */
 
-var port = normalizePort(process.env.PORT || '3000');
+// ✅ CÓDIGO ATUALIZADO para Render
+var port = normalizePort(process.env.PORT || '10000'); // Render usa 10000 por default
 app.set('port', port);
+
+// ⚠️ IMPORTANTE: Bind to 0.0.0.0 para o Render conseguir detetar a porta
+server.listen(port, '0.0.0.0', () => {
+  console.log(`Server running on port ${port}`);
+});
 
 /**
  * Create HTTP server.
