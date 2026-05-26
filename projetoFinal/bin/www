@@ -16,10 +16,6 @@ var http = require('http');
 var port = normalizePort(process.env.PORT || '10000'); // Render usa 10000 por default
 app.set('port', port);
 
-// ⚠️ IMPORTANTE: Bind to 0.0.0.0 para o Render conseguir detetar a porta
-server.listen(port, '0.0.0.0', () => {
-  console.log(`Server running on port ${port}`);
-});
 
 /**
  * Create HTTP server.
@@ -31,7 +27,9 @@ var server = http.createServer(app);
  * Listen on provided port, on all network interfaces.
  */
 
-server.listen(port);
+server.listen(port, '0.0.0.0', () => {
+  console.log(`Server running on port ${port}`);
+});
 server.on('error', onError);
 server.on('listening', onListening);
 
