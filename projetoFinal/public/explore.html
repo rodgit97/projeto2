@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Xwitter – Explorar</title>
+<link rel="stylesheet" href="../css/style.css"/>
+</head>
+<body>
+
+<div class="app-layout">
+
+  <nav class="sidebar" id="sidebar"></nav>
+
+  <main class="feed-panel">
+    <div class="panel-header">
+      <h1>Explorar</h1>
+    </div>
+
+    <!-- BARRA DE PESQUISA -->
+    <div style="padding:12px 16px;border-bottom:1px solid var(--border)">
+      <div class="search-wrap">
+        <svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" fill="none" stroke="currentColor">
+          <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+        </svg>
+        <input
+          class="search-input"
+          type="text"
+          id="search-input"
+          placeholder="Pesquisar tweets ou utilizadores..."
+          oninput="onSearch(this.value)"
+          autofocus
+        />
+      </div>
+
+      <!-- FILTROS -->
+      <div style="display:flex;gap:8px;margin-top:10px">
+        <button class="btn btn-primary btn-sm"  id="filter-tweets" onclick="setFilter('tweets')">Tweets</button>
+        <button class="btn btn-outline btn-sm"  id="filter-users"  onclick="setFilter('users')">Utilizadores</button>
+      </div>
+    </div>
+
+    <!-- RESULTADOS -->
+    <div id="results">
+      <div class="empty-state">
+        <svg style="width:40px;height:40px;margin:0 auto 12px;stroke:var(--text3);fill:none;stroke-width:1.5" viewBox="0 0 24 24">
+          <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+        </svg>
+        <h3>Descobre o que está a acontecer</h3>
+        <p>Pesquisa por palavras, hashtags ou @utilizador</p>
+      </div>
+    </div>
+  </main>
+
+  <aside class="right-sidebar">
+    <div style="margin-top:12px">
+      <div class="widget">
+        <div class="widget-header">Tendências</div>
+        <div id="trends-list"><div class="spinner" style="margin:16px auto"></div></div>
+      </div>
+    </div>
+  </aside>
+
+</div>
+
+<div id="toast"></div>
+
+<script src="../js/app.js"></script>
+<script>
+  requireAuth();
+  buildSidebar('explore');
+
+  let searchTimer = null;
+  let currentFilter = 'tweets';
+
+  loadTrends();
+
+  /* ── FILTRO ── */
+  function setFilter(f) {
+    currentFilter = f;
+    $('filter-tweets').className = `btn btn-sm ${f === 'tweets' ? 'btn-primary' : 'btn-outline'}`;
+    $('filter-users').className  = `btn btn-sm ${f === 'users'  ? 'btn-primary' : 'btn-outline'}`;
+    const q = $('search-input').value.trim();
+    if (q) runSearch(q);
+  }
+
+  /* ── PESQUISA ── */
+  function onSearch(q) {
+    clearTimeout(searchTimer);
+    if (!q.trim()) {
+      $('results').innerHTML = `<div class="empty-state"><h3>Pesquisa algo</h3></div>`;
+      return;
+    }
+    $('results').innerHTML = '<div class="spinner"></div>';
+    searchTimer = setTimeout(() => runSearch(q), 400);
+  }
+
+  async function runSearch(q) {
+    if (currentFilter === 'tweets') {
+      const res = await apiFetch(`/tweets?search=${encodeURIComponent(q)}`);
+      if (!res || !res.ok) { showError(); return; }
+      const tweets = await res.json();
+      if (!tweets.length) {
+        $('results').innerHTML = `<div class="empty-state"><h3>Sem resultados</h3><p>Tenta outra palavra-chave.</p></div>`;
+        return;
+      }
+      $('results').innerHTML = tweets.map(t => tweetCardHTML(t)).join('');
+    } else {
+      const res = await apiFetch(`/users?search=${encodeURIComponent(q)}`);
+      if (!res || !res.ok) { showError(); return; }
+      const users = await res.json();
+      if (!users.length) {
+        $('results').innerHTML = `<div class="empty-state"><h3>Sem utilizadores encontrados</h3></div>`;
+        return;
+      }
+      $('results').innerHTML = users.map(u => userCardHTML(u)).join('');
+    }
+  }
+
+  function showError() {
+    $('results').innerHTML = `<div class="empty-state"><h3>Erro ao pesquisar</h3><p>Verifica se a API está a correr.</p></div>`;
+  }
+
+  /* ── CARD DE UTILIZADOR ── */
+  function userCardHTML(u) {
+    return `
+    <div class="tweet-card" style="cursor:default">
+      <div class="avatar" style="width:44px;height:44px;font-size:17px">${avatarLetter(u.username)}</div>
+      <div style="flex:1;min-width:0">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:10px">
+          <div>
+            <div style="font-weight:700;font-size:15px">${escapeHtml(u.username)}</div>
+            <div style="color:var(--text2);font-size:14px">@${escapeHtml(u.username)}</div>
+            ${u.Profile?.bio ? `<div style="font-size:14px;margin-top:4px;color:var(--text2)">${escapeHtml(u.Profile.bio)}</div>` : ''}
+          </div>
+          <button class="btn btn-sm ${u.isFollowing ? 'btn-following' : 'btn-follow'}"
+                  id="follow-${u.id}"
+                  onclick="toggleFollow(${u.id}, this)">
+            ${u.isFollowing ? 'A seguir' : 'Seguir'}
+          </button>
+        </div>
+      </div>
+    </div>`;
+  }
+
+  async function toggleFollow(userId, btn) {
+    const following = btn.classList.contains('btn-following');
+    const res = await apiFetch(`/users/${userId}/follow`, { method: following ? 'DELETE' : 'POST' });
+    if (res && res.ok) {
+      btn.className = `btn btn-sm ${following ? 'btn-follow' : 'btn-following'}`;
+      btn.textContent = following ? 'Seguir' : 'A seguir';
+      showToast(following ? 'Deixaste de seguir.' : 'Agora estás a seguir!');
+    }
+  }
+
+  /* ── TENDÊNCIAS (últimos tweets com mais likes) ── */
+  async function loadTrends() {
+    const res = await apiFetch('/tweets?limit=5');
+    const el = $('trends-list');
+    if (!res || !res.ok) { el.innerHTML = ''; return; }
+    const tweets = await res.json();
+    if (!tweets.length) { el.innerHTML = '<p style="padding:12px 16px;color:var(--text2);font-size:14px">Sem tendências.</p>'; return; }
+    el.innerHTML = tweets.slice(0, 5).map((t, i) => `
+      <div class="widget-item" onclick="openTweetDetail(${t.id})">
+        <div>
+          <div style="font-size:12px;color:var(--text3)">#${i + 1} Tendência</div>
+          <div style="font-weight:700;font-size:14px">${escapeHtml(t.content.substring(0, 40))}${t.content.length > 40 ? '…' : ''}</div>
+          <div style="font-size:13px;color:var(--text2)">${t.likeCount || 0} likes</div>
+        </div>
+      </div>`).join('');
+  }
+</script>
+</body>
+</html>

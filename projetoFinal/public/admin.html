@@ -1,0 +1,552 @@
+<!doctype html>
+<html lang="pt">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Xwitter – Backoffice</title>
+    <link rel="stylesheet" href="../css/style.css" />
+    <style>
+      .admin-wrap {
+        padding: 20px 24px;
+      }
+      .admin-title {
+        font-size: 22px;
+        font-weight: 800;
+        margin-bottom: 4px;
+        letter-spacing: -0.3px;
+      }
+      .admin-sub {
+        color: var(--text2);
+        font-size: 14px;
+        margin-bottom: 20px;
+      }
+      .admin-tabs {
+        display: flex;
+        gap: 4px;
+        background: var(--bg2);
+        border: 1px solid var(--border);
+        border-radius: var(--r-sm);
+        padding: 4px;
+        margin-bottom: 20px;
+        width: fit-content;
+      }
+      .admin-tab {
+        padding: 8px 20px;
+        font-weight: 700;
+        font-size: 14px;
+        border: none;
+        background: none;
+        border-radius: 6px;
+        color: var(--text2);
+        cursor: pointer;
+        transition: 0.15s;
+      }
+      .admin-tab.active {
+        background: var(--bg);
+        color: var(--text);
+        box-shadow: var(--shadow);
+      }
+      .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 12px;
+        margin-bottom: 20px;
+      }
+      .stat-card {
+        background: var(--bg);
+        border: 1px solid var(--border);
+        border-radius: var(--r);
+        padding: 16px 20px;
+      }
+      .stat-card-label {
+        font-size: 13px;
+        color: var(--text2);
+        margin-bottom: 4px;
+      }
+      .stat-card-value {
+        font-size: 28px;
+        font-weight: 800;
+        letter-spacing: -0.5px;
+      }
+      .table-toolbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 12px;
+        gap: 12px;
+      }
+      .table-wrap {
+        background: var(--bg);
+        border: 1px solid var(--border);
+        border-radius: var(--r);
+        overflow: hidden;
+      }
+      .truncate {
+        max-width: 200px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="app-layout">
+      <nav class="sidebar" id="sidebar"></nav>
+
+      <main class="feed-panel" style="background: var(--bg2)">
+        <div class="panel-header" style="background: rgba(247, 249, 251, 0.9)">
+          <h1>⚙️ Backoffice</h1>
+        </div>
+
+        <div class="admin-wrap">
+          <p class="admin-sub">
+            Gestão de utilizadores e tweets da plataforma.
+          </p>
+
+          <!-- ESTATÍSTICAS -->
+          <div class="stats-grid">
+            <div class="stat-card">
+              <div class="stat-card-label">Total utilizadores</div>
+              <div class="stat-card-value" id="stat-users">–</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-card-label">Total tweets</div>
+              <div class="stat-card-value" id="stat-tweets">–</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-card-label">Total comentários</div>
+              <div class="stat-card-value" id="stat-comments">–</div>
+            </div>
+          </div>
+
+          <!-- TABS -->
+          <div class="admin-tabs">
+            <button
+              class="admin-tab active"
+              id="tab-users"
+              onclick="switchTab('users')"
+            >
+              👤 Utilizadores
+            </button>
+            <button
+              class="admin-tab"
+              id="tab-tweets"
+              onclick="switchTab('tweets')"
+            >
+              🐦 Tweets
+            </button>
+          </div>
+
+          <!-- TOOLBAR -->
+          <div class="table-toolbar">
+            <div class="search-wrap" style="flex: 1; max-width: 320px">
+              <svg
+                viewBox="0 0 24 24"
+                stroke-width="2"
+                stroke-linecap="round"
+                fill="none"
+                stroke="currentColor"
+              >
+                <circle cx="11" cy="11" r="8" />
+                <line x1="21" y1="21" x2="16.65" y2="16.65" />
+              </svg>
+              <input
+                class="search-input"
+                type="text"
+                id="table-search"
+                placeholder="Filtrar…"
+                oninput="filterTable(this.value)"
+              />
+            </div>
+            <span
+              id="table-count"
+              style="font-size: 13px; color: var(--text2)"
+            ></span>
+          </div>
+
+          <!-- TABELA -->
+          <div class="table-wrap">
+            <div id="admin-content"><div class="spinner"></div></div>
+          </div>
+        </div>
+      </main>
+
+      <!-- MODAL EDITAR UTILIZADOR -->
+      <div
+        class="modal-overlay hidden"
+        id="edit-user-modal"
+        onclick="closeModal(event, 'edit-user-modal')"
+      >
+        <div class="modal-box">
+          <div class="modal-header">
+            <button
+              class="modal-close"
+              onclick="$('edit-user-modal').classList.add('hidden')"
+            >
+              <svg viewBox="0 0 24 24">
+                <line x1="18" y1="6" x2="6" y2="18" />
+                <line x1="6" y1="6" x2="18" y2="18" />
+              </svg>
+            </button>
+            <span class="modal-title">Editar utilizador</span>
+            <button
+              class="btn btn-primary btn-sm"
+              style="margin-left: auto"
+              onclick="saveUser()"
+            >
+              Guardar
+            </button>
+          </div>
+          <div style="padding: 20px">
+            <input type="hidden" id="edit-user-id" />
+            <div class="form-group">
+              <label class="form-label">Username</label>
+              <input class="form-input" type="text" id="edit-user-username" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Email</label>
+              <input class="form-input" type="email" id="edit-user-email" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Role</label>
+              <select class="form-input" id="edit-user-role">
+                <option value="user">user</option>
+                <option value="admin">admin</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- MODAL EDITAR TWEET -->
+      <div
+        class="modal-overlay hidden"
+        id="edit-tweet-modal"
+        onclick="closeModal(event, 'edit-tweet-modal')"
+      >
+        <div class="modal-box">
+          <div class="modal-header">
+            <button
+              class="modal-close"
+              onclick="$('edit-tweet-modal').classList.add('hidden')"
+            >
+              <svg viewBox="0 0 24 24">
+                <line x1="18" y1="6" x2="6" y2="18" />
+                <line x1="6" y1="6" x2="18" y2="18" />
+              </svg>
+            </button>
+            <span class="modal-title">Editar tweet</span>
+            <button
+              class="btn btn-primary btn-sm"
+              style="margin-left: auto"
+              onclick="saveTweet()"
+            >
+              Guardar
+            </button>
+          </div>
+          <div style="padding: 20px">
+            <input type="hidden" id="edit-tweet-id" />
+            <div class="form-group">
+              <label class="form-label">Conteúdo</label>
+              <textarea
+                class="form-input"
+                id="edit-tweet-content"
+                rows="4"
+                maxlength="280"
+                style="resize: none"
+              ></textarea>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <aside class="right-sidebar" style="padding-top: 24px">
+        <div class="widget">
+          <div class="widget-header" style="font-size: 15px">
+            Acções rápidas
+          </div>
+          <div
+            style="
+              padding: 0 16px 16px;
+              display: flex;
+              flex-direction: column;
+              gap: 8px;
+            "
+          >
+            <button class="btn btn-outline btn-sm" onclick="loadData()">
+              🔄 Atualizar dados
+            </button>
+            <button
+              class="btn btn-outline btn-sm"
+              onclick="window.location.href = 'feed.html'"
+            >
+              ← Voltar ao feed
+            </button>
+          </div>
+        </div>
+      </aside>
+    </div>
+
+    <div id="toast"></div>
+
+    <script src="../js/app.js"></script>
+    <script>
+      requireAdmin();
+      buildSidebar("admin");
+
+      let currentTab = "users";
+      let allUsers = [];
+      let allTweets = [];
+
+      loadStats();
+      loadData();
+
+      /* ── ESTATÍSTICAS ── */
+      async function loadStats() {
+        const [uRes, tRes] = await Promise.all([
+          apiFetch("/admin/users"),
+          apiFetch("/admin/tweets"),
+        ]);
+        if (uRes && uRes.ok) {
+          const u = await uRes.json();
+          allUsers = u;
+          $("stat-users").textContent = u.length;
+        }
+        if (tRes && tRes.ok) {
+          const t = await tRes.json();
+          allTweets = t;
+          $("stat-tweets").textContent = t.length;
+        }
+        // Comentários (opcional – se a rota existir)
+        const cRes = await apiFetch("/admin/comments");
+        if (cRes && cRes.ok) {
+          const c = await cRes.json();
+          $("stat-comments").textContent = c.length;
+        } else {
+          $("stat-comments").textContent = "–";
+        }
+      }
+
+      /* ── TABS ── */
+      function switchTab(tab) {
+        currentTab = tab;
+        $("tab-users").classList.toggle("active", tab === "users");
+        $("tab-tweets").classList.toggle("active", tab === "tweets");
+        $("table-search").value = "";
+        renderTable(tab === "users" ? allUsers : allTweets);
+      }
+
+      /* ── CARREGAR DADOS ── */
+      async function loadData() {
+        $("admin-content").innerHTML = '<div class="spinner"></div>';
+        await loadStats();
+        renderTable(currentTab === "users" ? allUsers : allTweets);
+      }
+
+      /* ── FILTRO ── */
+      function filterTable(q) {
+        const data = currentTab === "users" ? allUsers : allTweets;
+        const filtered = q.trim()
+          ? data.filter((item) =>
+              JSON.stringify(item).toLowerCase().includes(q.toLowerCase()),
+            )
+          : data;
+        renderTable(filtered);
+      }
+
+      /* ── RENDER ── */
+      function renderTable(data) {
+        $("table-count").textContent =
+          `${data.length} resultado${data.length !== 1 ? "s" : ""}`;
+        if (currentTab === "users") renderUsers(data);
+        else renderTweets(data);
+      }
+
+      function renderUsers(users) {
+        if (!users.length) {
+          $("admin-content").innerHTML =
+            `<div class="empty-state"><h3>Sem utilizadores</h3></div>`;
+          return;
+        }
+        $("admin-content").innerHTML = `
+      <div class="admin-table-wrap">
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th>ID</th><th>Username</th><th>Email</th>
+              <th>Role</th><th>Registado em</th><th>Ações</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${users
+              .map(
+                (u) => `
+            <tr>
+              <td style="color:var(--text2)">${u.id}</td>
+              <td>
+                <div style="display:flex;align-items:center;gap:8px">
+                  <div class="avatar avatar-sm" style="width:28px;height:28px;font-size:12px">${avatarLetter(u.username)}</div>
+                  <strong>@${escapeHtml(u.username)}</strong>
+                </div>
+              </td>
+              <td style="color:var(--text2)">${escapeHtml(u.email)}</td>
+              <td><span class="badge ${u.role === "admin" ? "badge-admin" : "badge-user"}">${u.role}</span></td>
+              <td style="color:var(--text2)">${new Date(u.createdAt).toLocaleDateString("pt-PT")}</td>
+              <td>
+                <div style="display:flex;gap:4px">
+                  <button class="btn-icon" title="Editar" onclick="openEditUser(${u.id})">
+                    <svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                  </button>
+                  <button class="btn-icon danger" title="Eliminar" onclick="deleteUser(${u.id})">
+                    <svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M9 6V4h6v2"/></svg>
+                  </button>
+                </div>
+              </td>
+            </tr>`,
+              )
+              .join("")}
+          </tbody>
+        </table>
+      </div>`;
+      }
+
+      function renderTweets(tweets) {
+        if (!tweets.length) {
+          $("admin-content").innerHTML =
+            `<div class="empty-state"><h3>Sem tweets</h3></div>`;
+          return;
+        }
+        $("admin-content").innerHTML = `
+      <div class="admin-table-wrap">
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th>ID</th><th>Utilizador</th><th>Conteúdo</th>
+              <th>Likes</th><th>Publicado em</th><th>Ações</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${tweets
+              .map((t) => {
+                const u = t.User || t.user || {};
+                return `
+              <tr>
+                <td style="color:var(--text2)">${t.id}</td>
+                <td><strong>@${escapeHtml(u.username || "?")}</strong></td>
+                <td>
+                  <div class="truncate" title="${escapeHtml(t.content)}">
+                    ${escapeHtml(t.content)}
+                  </div>
+                </td>
+                <td>
+                  <span style="color:var(--like);font-weight:700">♥ ${t.likeCount || t._count?.likes || 0}</span>
+                </td>
+                <td style="color:var(--text2)">${new Date(t.createdAt).toLocaleDateString("pt-PT")}</td>
+                <td>
+                  <div style="display:flex;gap:4px">
+                    <button class="btn-icon" title="Ver tweet" onclick="window.open('tweet.html?id=${t.id}','_blank')">
+                      <svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                    </button>
+                    <button class="btn-icon" title="Editar" onclick="openEditTweet(${t.id}, '${escapeHtml(t.content).replace(/'/g, "\\'")}')">
+                      <svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                    </button>
+                    <button class="btn-icon danger" title="Eliminar" onclick="adminDeleteTweet(${t.id})">
+                      <svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M9 6V4h6v2"/></svg>
+                    </button>
+                  </div>
+                </td>
+              </tr>`;
+              })
+              .join("")}
+          </tbody>
+        </table>
+      </div>`;
+      }
+
+      /* ── MODAL HELPERS ── */
+      function closeModal(e, id) {
+        if (e.target === $(id)) $(id).classList.add("hidden");
+      }
+
+      /* ── EDITAR UTILIZADOR ── */
+      function openEditUser(id) {
+        const u = allUsers.find((u) => u.id === id);
+        if (!u) return;
+        $("edit-user-id").value = u.id;
+        $("edit-user-username").value = u.username;
+        $("edit-user-email").value = u.email;
+        $("edit-user-role").value = u.role;
+        $("edit-user-modal").classList.remove("hidden");
+      }
+
+      async function saveUser() {
+        const id = $("edit-user-id").value;
+        const body = {
+          username: $("edit-user-username").value.trim(),
+          email: $("edit-user-email").value.trim(),
+          role: $("edit-user-role").value,
+        };
+        const res = await apiFetch(`/admin/users/${id}`, {
+          method: "PATCH",
+          body: JSON.stringify(body),
+        });
+        if (res && res.ok) {
+          showToast("Utilizador atualizado!");
+          $("edit-user-modal").classList.add("hidden");
+          loadData();
+        } else {
+          showToast("Erro ao guardar.");
+        }
+      }
+
+      async function deleteUser(id) {
+        if (!confirm("Eliminar este utilizador e todos os seus dados?")) return;
+        const res = await apiFetch(`/admin/users/${id}`, { method: "DELETE" });
+        if (res && res.ok) {
+          showToast("Utilizador eliminado.");
+          allUsers = allUsers.filter((u) => u.id !== id);
+          renderTable(allUsers);
+          $("stat-users").textContent = allUsers.length;
+        }
+      }
+
+      /* ── EDITAR TWEET ── */
+      function openEditTweet(id, content) {
+        $("edit-tweet-id").value = id;
+        $("edit-tweet-content").value = content;
+        $("edit-tweet-modal").classList.remove("hidden");
+      }
+
+      async function saveTweet() {
+        const id = $("edit-tweet-id").value;
+        const content = $("edit-tweet-content").value.trim();
+        if (!content) {
+          showToast("O conteúdo não pode estar vazio.");
+          return;
+        }
+        const res = await apiFetch(`/admin/tweets/${id}`, {
+          method: "PATCH",
+          body: JSON.stringify({ content }),
+        });
+        if (res && res.ok) {
+          showToast("Tweet atualizado!");
+          $("edit-tweet-modal").classList.add("hidden");
+          loadData();
+        } else {
+          showToast("Erro ao guardar.");
+        }
+      }
+
+      async function adminDeleteTweet(id) {
+        if (!confirm("Eliminar este tweet?")) return;
+        const res = await apiFetch(`/admin/tweets/${id}`, { method: "DELETE" });
+        if (res && res.ok) {
+          showToast("Tweet eliminado.");
+          allTweets = allTweets.filter((t) => t.id !== id);
+          renderTable(allTweets);
+          $("stat-tweets").textContent = allTweets.length;
+        }
+      }
+    </script>
+  </body>
+</html>

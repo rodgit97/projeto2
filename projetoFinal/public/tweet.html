@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Xwitter – Tweet</title>
+<link rel="stylesheet" href="../css/style.css"/>
+</head>
+<body>
+
+<div class="app-layout">
+
+  <nav class="sidebar" id="sidebar"></nav>
+
+  <main class="feed-panel">
+    <div class="panel-header">
+      <button class="btn-icon" onclick="history.back()">
+        <svg style="width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round" viewBox="0 0 24 24">
+          <polyline points="15 18 9 12 15 6"/>
+        </svg>
+      </button>
+      <h1>Tweet</h1>
+    </div>
+
+    <!-- TWEET PRINCIPAL -->
+    <div id="tweet-detail"><div class="spinner"></div></div>
+
+    <!-- CAIXA DE COMENTÁRIO -->
+    <div id="comment-box" class="hidden" style="padding:14px 16px;border-bottom:1px solid var(--border)">
+      <div style="display:flex;gap:12px">
+        <div class="avatar avatar-sm" id="comment-avatar">?</div>
+        <div style="flex:1">
+          <textarea
+            class="compose-textarea"
+            id="comment-input"
+            placeholder="Adiciona o teu comentário..."
+            rows="2"
+            maxlength="280"
+            oninput="onCommentInput()"
+          ></textarea>
+          <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:8px;padding-top:8px;border-top:1px solid var(--border)">
+            <span class="char-counter" id="comment-char">280</span>
+            <button class="btn btn-primary btn-sm" id="comment-btn" onclick="submitComment()" disabled>
+              Comentar
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- LISTA DE COMENTÁRIOS -->
+    <div id="comments-list"></div>
+
+  </main>
+
+  <aside class="right-sidebar">
+    <div style="margin-top:12px">
+      <div class="widget">
+        <div class="widget-header">Quem seguir</div>
+        <div id="suggest-list"><div class="spinner" style="margin:16px auto"></div></div>
+      </div>
+    </div>
+  </aside>
+
+</div>
+
+<div id="toast"></div>
+
+<script src="../js/app.js"></script>
+<script>
+  requireAuth();
+  buildSidebar('');
+
+  const params  = new URLSearchParams(location.search);
+  const tweetId = parseInt(params.get('id'));
+
+  if (!tweetId) window.location.href = 'feed.html';
+
+  // Avatar na caixa de comentário
+  if (currentUser) {
+    $('comment-avatar').textContent = avatarLetter(currentUser.username);
+    $('comment-box').classList.remove('hidden');
+  }
+
+  init();
+
+  async function init() {
+    await Promise.all([loadTweet(), loadComments(), loadSuggestions()]);
+  }
+
+  /* ── TWEET PRINCIPAL ── */
+  async function loadTweet() {
+    const res = await apiFetch(`/tweets/${tweetId}`);
+    const el  = $('tweet-detail');
+    if (!res || !res.ok) {
+      el.innerHTML = `<div class="empty-state"><h3>Tweet não encontrado</h3></div>`;
+      return;
+    }
+    const tweet = await res.json();
+
+    const user   = tweet.User || tweet.user || {};
+    const name   = user.username || 'utilizador';
+    const liked  = tweet.likedByMe || false;
+    const likes  = tweet.likeCount || 0;
+    const imgUrl = tweet.imageUrl ? `${API}/${tweet.imageUrl}` : null;
+    const isOwner = currentUser && tweet.userId === currentUser.id;
+    const isAdmin = currentUser && currentUser.role === 'admin';
+
+    el.innerHTML = `
+    <div style="padding:14px 16px;border-bottom:1px solid var(--border)">
+      <div style="display:flex;gap:12px">
+        <div class="avatar" style="width:44px;height:44px;font-size:17px">${avatarLetter(name)}</div>
+        <div style="flex:1">
+          <div style="font-weight:700;font-size:16px">${escapeHtml(name)}</div>
+          <div style="color:var(--text2);font-size:14px">@${escapeHtml(name)}</div>
+        </div>
+        ${(isOwner || isAdmin) ? `
+        <button class="btn-icon danger" title="Eliminar tweet" onclick="deleteTweet(${tweet.id}, this)">
+          <svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M9 6V4h6v2"/></svg>
+        </button>` : ''}
+      </div>
+
+      <div style="font-size:20px;line-height:1.6;margin:14px 0;white-space:pre-wrap;word-break:break-word">
+        ${escapeHtml(tweet.content)}
+      </div>
+
+      ${imgUrl ? `<div class="tweet-image" style="margin-bottom:12px"><img src="${imgUrl}" alt="imagem"/></div>` : ''}
+
+      <div style="color:var(--text2);font-size:14px;padding:12px 0;border-top:1px solid var(--border);border-bottom:1px solid var(--border)">
+        ${new Date(tweet.createdAt).toLocaleString('pt-PT', { day:'numeric', month:'long', year:'numeric', hour:'2-digit', minute:'2-digit' })}
+      </div>
+
+      <div style="display:flex;gap:20px;padding:12px 0;font-size:14px;border-bottom:1px solid var(--border)">
+        <span><strong>${tweet.commentCount || 0}</strong> <span style="color:var(--text2)">Comentários</span></span>
+        <span><strong id="like-count">${likes}</strong> <span style="color:var(--text2)">Gostos</span></span>
+      </div>
+
+      <div style="display:flex;gap:0;padding:4px 0;margin:0 -10px">
+        <button class="tweet-action like ${liked ? 'liked' : ''}" id="like-btn-${tweet.id}" onclick="handleLike(${tweet.id}, this)" style="min-width:auto;flex:1;justify-content:center">
+          <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z" ${liked ? 'fill="currentColor"' : ''}/></svg>
+          Gosto
+        </button>
+      </div>
+    </div>`;
+  }
+
+  function handleLike(tweetId, btn) {
+    toggleLike(tweetId, btn);
+    // Atualizar contador grande
+    const countEl = $('like-count');
+    if (countEl) {
+      const liked = btn.classList.contains('liked');
+      countEl.textContent = parseInt(countEl.textContent) + (liked ? 1 : -1);
+    }
+  }
+
+  /* ── COMENTÁRIOS ── */
+  async function loadComments() {
+    const res = await apiFetch(`/tweets/${tweetId}/comments`);
+    const el  = $('comments-list');
+    if (!res || !res.ok) { el.innerHTML = ''; return; }
+    const comments = await res.json();
+
+    if (!comments.length) {
+      el.innerHTML = `<div class="empty-state" style="padding:40px 20px">
+        <h3>Sem comentários</h3>
+        <p>Sê o primeiro a comentar!</p>
+      </div>`;
+      return;
+    }
+
+    el.innerHTML = comments.map(c => {
+      const u    = c.User || c.user || {};
+      const name = u.username || '?';
+      const isOwn   = currentUser && c.userId === currentUser.id;
+      const isAdmin = currentUser && currentUser.role === 'admin';
+      return `
+      <div class="tweet-card" style="cursor:default" id="comment-${c.id}">
+        <div class="avatar avatar-sm">${avatarLetter(name)}</div>
+        <div class="tweet-body">
+          <div class="tweet-header">
+            <span class="tweet-name">${escapeHtml(name)}</span>
+            <span class="tweet-handle">@${escapeHtml(name)}</span>
+            <span class="tweet-dot">·</span>
+            <span class="tweet-time">${timeAgo(c.createdAt)}</span>
+          </div>
+          <div class="tweet-text">${escapeHtml(c.content)}</div>
+          ${(isOwn || isAdmin) ? `
+          <div style="margin-top:8px">
+            <button class="btn-icon danger btn-sm" onclick="deleteComment(${c.id}, this)">
+              <svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M9 6V4h6v2"/></svg>
+            </button>
+          </div>` : ''}
+        </div>
+      </div>`;
+    }).join('');
+  }
+
+  function onCommentInput() {
+    const val = $('comment-input').value;
+    const rem = 280 - val.length;
+    $('comment-char').textContent = rem;
+    $('comment-char').className = 'char-counter' + (rem < 20 ? ' warn' : '');
+    $('comment-btn').disabled = val.trim().length === 0;
+  }
+
+  async function submitComment() {
+    const content = $('comment-input').value.trim();
+    if (!content) return;
+    const btn = $('comment-btn');
+    btn.disabled = true; btn.textContent = '...';
+
+    const res = await apiFetch(`/tweets/${tweetId}/comments`, {
+      method: 'POST',
+      body:   JSON.stringify({ content }),
+    });
+
+    btn.textContent = 'Comentar';
+
+    if (res && res.ok) {
+      $('comment-input').value = '';
+      onCommentInput();
+      showToast('Comentário publicado!');
+      loadComments();
+    } else {
+      showToast('Erro ao publicar comentário.');
+      btn.disabled = false;
+    }
+  }
+
+  async function deleteComment(commentId, btn) {
+    if (!confirm('Eliminar este comentário?')) return;
+    const res = await apiFetch(`/comments/${commentId}`, { method: 'DELETE' });
+    if (res && res.ok) {
+      const el = $(`comment-${commentId}`);
+      if (el) { el.style.opacity = '0'; el.style.transition = '.3s'; setTimeout(() => el.remove(), 300); }
+      showToast('Comentário eliminado.');
+    }
+  }
+
+  /* ── SUGESTÕES ── */
+  async function loadSuggestions() {
+    const res = await apiFetch('/users');
+    if (!res || !res.ok) return;
+    const users = (await res.json()).filter(u => u.id !== currentUser.id).slice(0, 4);
+    $('suggest-list').innerHTML = users.map(u => `
+      <div class="widget-item" onclick="window.location.href='profile.html?id=${u.id}'">
+        <div class="avatar avatar-sm">${avatarLetter(u.username)}</div>
+        <div class="widget-item-info">
+          <div class="widget-item-name">${escapeHtml(u.username)}</div>
+          <div class="widget-item-handle">@${escapeHtml(u.username)}</div>
+        </div>
+      </div>`).join('');
+  }
+</script>
+</body>
+</html>

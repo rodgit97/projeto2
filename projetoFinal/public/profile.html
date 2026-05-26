@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Xwitter – Perfil</title>
+<link rel="stylesheet" href="../css/style.css"/>
+</head>
+<body>
+
+<div class="app-layout">
+
+  <nav class="sidebar" id="sidebar"></nav>
+
+  <main class="feed-panel">
+
+    <!-- CABEÇALHO -->
+    <div class="panel-header">
+      <button class="btn-icon" onclick="history.back()" title="Voltar">
+        <svg style="width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round" viewBox="0 0 24 24">
+          <polyline points="15 18 9 12 15 6"/>
+        </svg>
+      </button>
+      <div>
+        <h1 id="header-name">Perfil</h1>
+        <div style="font-size:13px;color:var(--text2)" id="header-tweets">0 tweets</div>
+      </div>
+    </div>
+
+    <!-- BANNER + INFO -->
+    <div class="profile-banner" id="profile-banner"></div>
+
+    <div class="profile-info-wrap">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between">
+        <div class="profile-avatar-wrap">
+          <div class="avatar" id="profile-avatar" style="width:80px;height:80px;font-size:30px;border:4px solid var(--bg)">?</div>
+        </div>
+        <div id="profile-action" style="margin-top:12px"></div>
+      </div>
+
+      <div class="profile-name"   id="profile-name">–</div>
+      <div class="profile-handle" id="profile-handle">@–</div>
+      <div class="profile-bio"    id="profile-bio"></div>
+
+      <div class="profile-stats">
+        <a href="#"><strong id="stat-tweets">0</strong> Tweets</a>
+        <a href="#"><strong id="stat-following">0</strong> A seguir</a>
+        <a href="#"><strong id="stat-followers">0</strong> Seguidores</a>
+      </div>
+    </div>
+
+    <!-- TABS -->
+    <div class="feed-tabs">
+      <button class="feed-tab active" id="tab-tweets"  onclick="switchProfileTab('tweets')">Tweets</button>
+      <button class="feed-tab"        id="tab-likes"   onclick="switchProfileTab('likes')">Gostos</button>
+    </div>
+
+    <!-- CONTEÚDO -->
+    <div id="profile-content"><div class="spinner"></div></div>
+
+  </main>
+
+  <!-- MODAL EDITAR PERFIL -->
+  <div class="modal-overlay hidden" id="edit-modal" onclick="closeEditModal(event)">
+    <div class="modal-box">
+      <div class="modal-header">
+        <button class="modal-close" onclick="$('edit-modal').classList.add('hidden')">
+          <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+        <span class="modal-title">Editar perfil</span>
+        <button class="btn btn-primary btn-sm" style="margin-left:auto" onclick="saveProfile()">Guardar</button>
+      </div>
+      <div style="padding:20px">
+        <div class="form-group">
+          <label class="form-label">Bio</label>
+          <textarea class="form-input" id="edit-bio" rows="3" maxlength="160" placeholder="Fala sobre ti…" style="resize:none"></textarea>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Localização</label>
+          <input class="form-input" type="text" id="edit-location" placeholder="Lisboa, Portugal"/>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Website</label>
+          <input class="form-input" type="url" id="edit-website" placeholder="https://exemplo.com"/>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <aside class="right-sidebar">
+    <div style="margin-top:12px">
+      <div class="widget" id="suggest-widget">
+        <div class="widget-header">Quem seguir</div>
+        <div id="suggest-list"><div class="spinner" style="margin:16px auto"></div></div>
+      </div>
+    </div>
+  </aside>
+
+</div>
+
+<div id="toast"></div>
+
+<script src="../js/app.js"></script>
+<script>
+  requireAuth();
+  buildSidebar('profile');
+
+  // Determinar qual utilizador mostrar
+  const params   = new URLSearchParams(location.search);
+  const userId   = parseInt(params.get('id')) || currentUser.id;
+  const isOwnProfile = userId === currentUser.id;
+
+  let profileTab = 'tweets';
+  let profileData = null;
+
+  init();
+
+  async function init() {
+    await loadProfile();
+    loadProfileContent();
+    loadSuggestions();
+  }
+
+  /* ── CARREGAR PERFIL ── */
+  async function loadProfile() {
+    const res = await apiFetch(`/users/${userId}`);
+    if (!res || !res.ok) return;
+    profileData = await res.json();
+
+    const name   = profileData.username || '';
+    const letter = avatarLetter(name);
+    const bio    = profileData.Profile?.bio || '';
+
+    $('header-name').textContent   = name;
+    $('profile-name').textContent  = name;
+    $('profile-handle').textContent = '@' + name;
+    $('profile-bio').textContent   = bio;
+    $('profile-avatar').textContent = letter;
+
+    $('stat-tweets').textContent   = profileData.tweetCount    || 0;
+    $('stat-following').textContent = profileData.followingCount || 0;
+    $('stat-followers').textContent = profileData.followersCount || 0;
+
+    // Botão de ação
+    if (isOwnProfile) {
+      $('profile-action').innerHTML = `
+        <button class="btn btn-outline btn-sm" onclick="openEditModal()">Editar perfil</button>`;
+    } else {
+      const following = profileData.isFollowing;
+      $('profile-action').innerHTML = `
+        <button class="btn btn-sm ${following ? 'btn-following' : 'btn-follow'}"
+                id="follow-btn"
+                onclick="toggleFollow()">
+          ${following ? 'A seguir' : 'Seguir'}
+        </button>`;
+    }
+  }
+
+  /* ── TABS ── */
+  function switchProfileTab(tab) {
+    profileTab = tab;
+    $('tab-tweets').classList.toggle('active', tab === 'tweets');
+    $('tab-likes').classList.toggle('active',  tab === 'likes');
+    loadProfileContent();
+  }
+
+  async function loadProfileContent() {
+    const el = $('profile-content');
+    el.innerHTML = '<div class="spinner"></div>';
+
+    const endpoint = profileTab === 'tweets'
+      ? `/users/${userId}/tweets`
+      : `/users/${userId}/likes`;
+
+    const res = await apiFetch(endpoint);
+    if (!res || !res.ok) {
+      el.innerHTML = `<div class="empty-state"><h3>Erro ao carregar</h3></div>`;
+      return;
+    }
+
+    const items = await res.json();
+    $('header-tweets').textContent = profileTab === 'tweets'
+      ? `${items.length} tweet${items.length !== 1 ? 's' : ''}`
+      : `${items.length} gosto${items.length !== 1 ? 's' : ''}`;
+
+    if (!items.length) {
+      el.innerHTML = `<div class="empty-state">
+        <h3>${profileTab === 'tweets' ? 'Ainda sem tweets' : 'Ainda sem gostos'}</h3>
+        <p>${isOwnProfile ? 'Os teus tweets aparecem aqui.' : 'Nada para mostrar.'}</p>
+      </div>`;
+      return;
+    }
+
+    el.innerHTML = items.map(t => tweetCardHTML(t)).join('');
+  }
+
+  /* ── FOLLOW ── */
+  async function toggleFollow() {
+    const btn = $('follow-btn');
+    const following = btn.classList.contains('btn-following');
+    const res = await apiFetch(`/users/${userId}/follow`, { method: following ? 'DELETE' : 'POST' });
+    if (res && res.ok) {
+      btn.className = `btn btn-sm ${following ? 'btn-follow' : 'btn-following'}`;
+      btn.textContent = following ? 'Seguir' : 'A seguir';
+      const statEl = $('stat-followers');
+      statEl.textContent = parseInt(statEl.textContent) + (following ? -1 : 1);
+      showToast(following ? 'Deixaste de seguir.' : 'Agora estás a seguir!');
+    }
+  }
+
+  /* ── EDITAR PERFIL ── */
+  function openEditModal() {
+    if (profileData?.Profile) {
+      $('edit-bio').value      = profileData.Profile.bio      || '';
+      $('edit-location').value = profileData.Profile.location || '';
+      $('edit-website').value  = profileData.Profile.website  || '';
+    }
+    $('edit-modal').classList.remove('hidden');
+  }
+
+  function closeEditModal(e) {
+    if (e.target === $('edit-modal')) $('edit-modal').classList.add('hidden');
+  }
+
+  async function saveProfile() {
+    const body = {
+      bio:      $('edit-bio').value.trim(),
+      location: $('edit-location').value.trim(),
+      website:  $('edit-website').value.trim(),
+    };
+    const res = await apiFetch(`/users/${userId}/profile`, {
+      method: 'PATCH',
+      body:   JSON.stringify(body),
+    });
+    if (res && res.ok) {
+      showToast('Perfil atualizado!');
+      $('edit-modal').classList.add('hidden');
+      loadProfile();
+    } else {
+      showToast('Erro ao guardar.');
+    }
+  }
+
+  /* ── SUGESTÕES ── */
+  async function loadSuggestions() {
+    const res = await apiFetch('/users');
+    if (!res || !res.ok) return;
+    const users = await res.json();
+    const others = users.filter(u => u.id !== currentUser.id && u.id !== userId).slice(0, 4);
+    const el = $('suggest-list');
+    if (!others.length) { el.innerHTML = ''; return; }
+    el.innerHTML = others.map(u => `
+      <div class="widget-item" onclick="window.location.href='profile.html?id=${u.id}'">
+        <div class="avatar avatar-sm">${avatarLetter(u.username)}</div>
+        <div class="widget-item-info">
+          <div class="widget-item-name">${escapeHtml(u.username)}</div>
+          <div class="widget-item-handle">@${escapeHtml(u.username)}</div>
+        </div>
+      </div>`).join('');
+  }
+</script>
+</body>
+</html>
