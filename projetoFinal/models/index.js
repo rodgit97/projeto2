@@ -1,14 +1,72 @@
-'use strict';
+// 'use strict';
 
-const fs = require('fs');
-const path = require('path');
-const Sequelize = require('sequelize');
-const process = require('process');
-const basename = path.basename(__filename);
-const env = process.env.NODE_ENV || 'development';
-const config = require(__dirname + '/../config/config.json')[env];
-const db = {};
+// const fs = require('fs');
+// const path = require('path');
+const Sequelize = require("sequelize");
+const sequelize = require("../config/database");
 
+const User = require("./User");
+const Profile = require("./Profile");
+const Tweet = require("./Tweet");
+const Like = require("./Like");
+const Follow = require("./Follow");
+
+// const User = require("./models/User");
+// const Profile = require("./models/Profile");
+// const Tweet = require("./models/Tweet");
+// const Like = require("./models");
+// const Follow = require("./Follow");
+
+User.hasOne(Profile, { foreignKey: "userId", as: "profile" });
+Profile.belongsTo(User, { foreignKey: "userId", as: "user" });
+
+User.hasMany(Tweet, { foreignKey: "userId", as: "tweets" });
+Tweet.belongsTo(User, { foreignKey: "userId", as: "author" });
+
+User.belongsToMany(Tweet, {
+  through: Like,
+  as: "likedTweets",
+  foreignKey: "userId",
+});
+Tweet.belongsToMany(User, {
+  through: Like,
+  as: "likedBy",
+  foreignKey: "tweetId",
+});
+
+User.belongsToMany(User, {
+  through: Follow,
+  as: "followers",
+  foreignKey: "followingId",
+});
+User.belongsToMany(User, {
+  through: Follow,
+  as: "following",
+  foreignKey: "followerId",
+});
+
+Like.belongsTo(User, { foreignKey: "userId", as: "user" });
+Like.belongsTo(Tweet, { foreignKey: "tweetId", as: "tweet" });
+
+Follow.belongsTo(User, { foreignKey: "followerId", as: "follower" });
+Follow.belongsTo(User, { foreignKey: "followedId", as: "followed" });
+
+module.exports = {
+  User,
+  Profile,
+  Tweet,
+  Like,
+  Follow,
+  sequelize,
+  Sequelize,
+};
+// const process = require('process');
+// const basename = path.basename(__filename);
+// const env = process.env.NODE_ENV || 'development';
+// const config = require(__dirname + '/../config/config.json')[env];
+// const db = {};
+
+/*
 let sequelize;
 if (config.use_env_variable) {
   sequelize = new Sequelize(process.env[config.use_env_variable], config);
@@ -41,3 +99,4 @@ db.sequelize = sequelize;
 db.Sequelize = Sequelize;
 
 module.exports = db;
+*/

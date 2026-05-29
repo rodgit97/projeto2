@@ -1,0 +1,20 @@
+-Registo:nomeUtilizador, email, password
+-Login: username/password
+-Users: tweet, follow, feed, like, publicar imagem, comentários -> Backoffice: ver utilizadores, editar utilizadores, excluir utilizadores; ver tweets, editar tweets, excluir tweets.
+
+
+Usando:
+ backend: express-generator ou express.
+ tweet:
+  CRUD: 
+   GET index;
+   GET show(id);
+   POST store();
+   PATCH update();
+   DELETE delete(id).
+ .env .
+ MVC:
+  /controllers,
+  /models,
+  /routes.
+ 

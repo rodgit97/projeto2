@@ -1,263 +1,386 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="pt">
-<head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Xwitter – Início</title>
-<link rel="stylesheet" href="../css/style.css"/>
-</head>
-<body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Xwitter – Início</title>
+    <link rel="stylesheet" href="../css/style.css" />
+  </head>
+  <body>
+    <div class="app-layout">
+      <nav class="sidebar" id="sidebar"></nav>
 
-<div class="app-layout">
-
-  <!-- SIDEBAR -->
-  <nav class="sidebar" id="sidebar"></nav>
-
-  <!-- FEED PRINCIPAL -->
-  <main class="feed-panel">
-
-    <!-- CABEÇALHO COM TABS -->
-    <div>
-      <div class="panel-header"><h1>Início</h1></div>
-      <div class="feed-tabs">
-        <button class="feed-tab active" id="tab-feed" onclick="switchTab('feed')">Para si</button>
-        <button class="feed-tab"        id="tab-all"  onclick="switchTab('all')">Global</button>
-      </div>
-    </div>
-
-    <!-- CAIXA DE COMPOSIÇÃO -->
-    <div class="compose-box">
-      <div class="avatar" id="compose-avatar" style="width:40px;height:40px;font-size:15px">?</div>
-      <div class="compose-right">
-        <textarea
-          class="compose-textarea"
-          id="compose-text"
-          placeholder="O que está a acontecer?"
-          maxlength="300"
-          rows="2"
-          oninput="onComposeInput()"
-        ></textarea>
-
-        <!-- Preview da imagem selecionada -->
-        <div class="compose-image-preview hidden" id="compose-preview">
-          <img id="compose-preview-img" src="" alt="preview"/>
-          <button class="compose-image-remove" onclick="removeImage()">✕</button>
-        </div>
-
-        <div class="compose-footer">
-          <div class="compose-actions">
-            <!-- Botão de imagem -->
-            <label class="compose-btn-icon" title="Adicionar imagem" style="cursor:pointer">
-              <input type="file" id="image-input" accept="image/*" style="display:none" onchange="onImageSelect(event)"/>
-              <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
-            </label>
-          </div>
-          <div class="compose-right-actions">
-            <span class="char-counter" id="char-count">280</span>
-            <button class="btn btn-primary btn-sm" id="post-btn" onclick="submitTweet()" disabled>
-              Publicar
+      <main class="feed-panel">
+        <div>
+          <div class="panel-header"><h1>Início</h1></div>
+          <div class="feed-tabs">
+            <button
+              class="feed-tab active"
+              id="tab-feed"
+              onclick="switchTab('feed')"
+            >
+              Para si
+            </button>
+            <button class="feed-tab" id="tab-all" onclick="switchTab('all')">
+              Global
             </button>
           </div>
         </div>
-      </div>
+
+        <div id="tweets-list"><div class="spinner"></div></div>
+      </main>
+
+      <aside class="right-sidebar">
+        <div style="margin-top: 12px">
+          <div class="search-wrap">
+            <svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round">
+              <circle cx="11" cy="11" r="8" />
+              <line x1="21" y1="21" x2="16.65" y2="16.65" />
+            </svg>
+            <input
+              class="search-input"
+              type="text"
+              placeholder="Pesquisar..."
+              oninput="onSideSearch(this.value)"
+              id="side-search"
+            />
+          </div>
+        </div>
+
+        <div class="widget" id="suggest-widget">
+          <div class="widget-header">Quem seguir</div>
+          <div id="suggest-list">
+            <div class="spinner" style="margin: 16px auto"></div>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </body>
+</html>
+<!-- <!doctype html>
+<html lang="pt">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Xwitter – Início</title>
+    <link rel="stylesheet" href="../css/style.css" />
+  </head>
+  <body>
+    <div class="app-layout">
+      //IDEBAR 
+      <nav class="sidebar" id="sidebar"></nav>
+
+      // FEED PRINCIPAL 
+      <main class="feed-panel">
+        //- CABEÇALHO COM TABS 
+        <div>
+          <div class="panel-header"><h1>Início</h1></div>
+          <div class="feed-tabs">
+            <button
+              class="feed-tab active"
+              id="tab-feed"
+              onclick="switchTab('feed')"
+            >
+              Para si
+            </button>
+            <button class="feed-tab" id="tab-all" onclick="switchTab('all')">
+              Global
+            </button>
+          </div>
+        </div>
+
+        // CAIXA DE COMPOSIÇÃO 
+        <div class="compose-box">
+          <div
+            class="avatar"
+            id="compose-avatar"
+            style="width: 40px; height: 40px; font-size: 15px"
+          >
+            ?
+          </div>
+          <div class="compose-right">
+            <textarea
+              class="compose-textarea"
+              id="compose-text"
+              placeholder="O que está a acontecer?"
+              maxlength="300"
+              rows="2"
+              oninput="onComposeInput()"
+            ></textarea>
+
+            // Preview da imagem selecionada 
+            <div class="compose-image-preview hidden" id="compose-preview">
+              <img id="compose-preview-img" src="" alt="preview" />
+              <button class="compose-image-remove" onclick="removeImage()">
+                ✕
+              </button>
+            </div>
+
+            <div class="compose-footer">
+              <div class="compose-actions">
+                // Botão de imagem 
+                <label
+                  class="compose-btn-icon"
+                  title="Adicionar imagem"
+                  style="cursor: pointer"
+                >
+                  <input
+                    type="file"
+                    id="image-input"
+                    accept="image/*"
+                    style="display: none"
+                    onchange="onImageSelect(event)"
+                  />
+                  <svg viewBox="0 0 24 24">
+                    <rect x="3" y="3" width="18" height="18" rx="2" />
+                    <circle cx="8.5" cy="8.5" r="1.5" />
+                    <polyline points="21 15 16 10 5 21" />
+                  </svg>
+                </label>
+              </div>
+              <div class="compose-right-actions">
+                <span class="char-counter" id="char-count">280</span>
+                <button
+                  class="btn btn-primary btn-sm"
+                  id="post-btn"
+                  onclick="submitTweet()"
+                  disabled
+                >
+                  Publicar
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+       //LISTA DE TWEETS 
+        <div id="tweets-list">
+          <div class="spinner"></div>
+        </div>
+      </main>
+
+     //IDEBAR DIREITA 
+      <aside class="right-sidebar">
+        // Pesquisa rápida 
+        <div style="margin-top: 12px">
+          <div class="search-wrap">
+            <svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round">
+              <circle cx="11" cy="11" r="8" />
+              <line x1="21" y1="21" x2="16.65" y2="16.65" />
+            </svg>
+            <input
+              class="search-input"
+              type="text"
+              placeholder="Pesquisar..."
+              oninput="onSideSearch(this.value)"
+              id="side-search"
+            />
+          </div>
+        </div>
+
+        // Quem seguir
+        <div class="widget" id="suggest-widget">
+          <div class="widget-header">Quem seguir</div>
+          <div id="suggest-list">
+            <div class="spinner" style="margin: 16px auto"></div>
+          </div>
+        </div>
+      </aside>
     </div>
 
-    <!-- LISTA DE TWEETS -->
-    <div id="tweets-list">
-      <div class="spinner"></div>
-    </div>
+    // TOAST
+    <div id="toast"></div>
 
-  </main>
+    <script src="../js/app.js"></script>
+    <script>
+      /* ── INIT ── */
+      requireAuth();
+      buildSidebar("feed");
 
-  <!-- SIDEBAR DIREITA -->
-  <aside class="right-sidebar">
-    <!-- Pesquisa rápida -->
-    <div style="margin-top:12px">
-      <div class="search-wrap">
-        <svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-        <input class="search-input" type="text" placeholder="Pesquisar..." oninput="onSideSearch(this.value)" id="side-search"/>
-      </div>
-    </div>
+      // Avatar na caixa de composição
+      if (currentUser) {
+        $("compose-avatar").textContent = avatarLetter(currentUser.username);
+      }
 
-    <!-- Quem seguir -->
-    <div class="widget" id="suggest-widget">
-      <div class="widget-header">Quem seguir</div>
-      <div id="suggest-list"><div class="spinner" style="margin:16px auto"></div></div>
-    </div>
-  </aside>
+      let currentTab = "feed";
+      let selectedImage = null;
+      let searchTimer = null;
+      let cachedUsers = [];
 
-</div>
-
-<!-- TOAST -->
-<div id="toast"></div>
-
-<script src="../js/app.js"></script>
-<script>
-  /* ── INIT ── */
-  requireAuth();
-  buildSidebar('feed');
-
-  // Avatar na caixa de composição
-  if (currentUser) {
-    $('compose-avatar').textContent = avatarLetter(currentUser.username);
-  }
-
-  let currentTab       = 'feed';
-  let selectedImage    = null;
-  let searchTimer      = null;
-  let cachedUsers      = [];
-
-  loadTweets();
-  loadSuggestions();
-
-  /* ── TABS ── */
-  function switchTab(tab) {
-    currentTab = tab;
-    $('tab-feed').classList.toggle('active', tab === 'feed');
-    $('tab-all').classList.toggle('active',  tab === 'all');
-    loadTweets();
-  }
-
-  /* ── CARREGAR TWEETS ── */
-  async function loadTweets() {
-    const list = $('tweets-list');
-    list.innerHTML = '<div class="spinner"></div>';
-
-    const endpoint = currentTab === 'feed' ? '/tweets/feed' : '/tweets';
-    const res = await apiFetch(endpoint);
-
-    if (!res || !res.ok) {
-      list.innerHTML = `<div class="empty-state"><h3>Erro ao carregar</h3><p>Verifica se a API está a correr.</p></div>`;
-      return;
-    }
-
-    const tweets = await res.json();
-
-    if (!tweets.length) {
-      list.innerHTML = `<div class="empty-state">
-        <h3>Sem tweets ainda</h3>
-        <p>${currentTab === 'feed' ? 'Segue utilizadores para ver os seus tweets aqui.' : 'Sê o primeiro a publicar!'}</p>
-      </div>`;
-      return;
-    }
-
-    list.innerHTML = tweets.map(t => tweetCardHTML(t)).join('');
-  }
-
-  /* ── COMPOSIÇÃO ── */
-  function onComposeInput() {
-    const val = $('compose-text').value;
-    const rem = 280 - val.length;
-    const cc  = $('char-count');
-    cc.textContent = rem;
-    cc.className = 'char-counter' + (rem < 20 ? (rem < 0 ? ' over' : ' warn') : '');
-    $('post-btn').disabled = val.trim().length === 0 || rem < 0;
-  }
-
-  function onImageSelect(e) {
-    const file = e.target.files[0];
-    if (!file) return;
-    selectedImage = file;
-    $('compose-preview-img').src = URL.createObjectURL(file);
-    $('compose-preview').classList.remove('hidden');
-    $('post-btn').disabled = false;
-  }
-
-  function removeImage() {
-    selectedImage = null;
-    $('compose-preview').classList.add('hidden');
-    $('compose-preview-img').src = '';
-    $('image-input').value = '';
-    onComposeInput();
-  }
-
-  async function submitTweet() {
-    const content = $('compose-text').value.trim();
-    if (!content && !selectedImage) return;
-
-    const btn = $('post-btn');
-    btn.disabled = true;
-    btn.textContent = '...';
-
-    let res;
-    if (selectedImage) {
-      const fd = new FormData();
-      fd.append('content', content);
-      fd.append('image', selectedImage);
-      res = await apiFetch('/tweets', { method: 'POST', body: fd });
-    } else {
-      res = await apiFetch('/tweets', { method: 'POST', body: JSON.stringify({ content }) });
-    }
-
-    btn.textContent = 'Publicar';
-
-    if (res && res.ok) {
-      $('compose-text').value = '';
-      removeImage();
-      onComposeInput();
-      showToast('Tweet publicado!');
       loadTweets();
-    } else {
-      const d = res ? await res.json() : {};
-      showToast(d.message || 'Erro ao publicar.');
-      btn.disabled = false;
-    }
-  }
+      loadSuggestions();
 
-  /* ── PESQUISA LATERAL ── */
-  function onSideSearch(q) {
-    clearTimeout(searchTimer);
-    searchTimer = setTimeout(() => {
-      if (!q.trim()) { loadSuggestions(); return; }
-      const filtered = cachedUsers.filter(u =>
-        u.username.toLowerCase().includes(q.toLowerCase()) && u.id !== currentUser?.id
-      );
-      renderSuggestions(filtered.slice(0, 5));
-    }, 300);
-  }
+      /* ── TABS ── */
+      function switchTab(tab) {
+        currentTab = tab;
+        $("tab-feed").classList.toggle("active", tab === "feed");
+        $("tab-all").classList.toggle("active", tab === "all");
+        loadTweets();
+      }
 
-  /* ── SUGESTÕES ── */
-  async function loadSuggestions() {
-    const res = await apiFetch('/users');
-    if (!res || !res.ok) return;
-    cachedUsers = await res.json();
-    const others = cachedUsers.filter(u => u.id !== currentUser?.id).slice(0, 5);
-    renderSuggestions(others);
-  }
+      /* ── CARREGAR TWEETS ── */
+      async function loadTweets() {
+        const list = $("tweets-list");
+        list.innerHTML = '<div class="spinner"></div>';
 
-  function renderSuggestions(users) {
-    const el = $('suggest-list');
-    if (!users.length) { el.innerHTML = '<p style="padding:12px 16px;color:var(--text2);font-size:14px">Sem sugestões.</p>'; return; }
-    el.innerHTML = users.map(u => `
+        const endpoint = currentTab === "feed" ? "/tweets/feed" : "/tweets";
+        const res = await apiFetch(endpoint);
+
+        if (!res || !res.ok) {
+          list.innerHTML = `<div class="empty-state"><h3>Erro ao carregar</h3><p>Verifica se a API está a correr.</p></div>`;
+          return;
+        }
+
+        const tweets = await res.json();
+
+        if (!tweets.length) {
+          list.innerHTML = `<div class="empty-state">
+        <h3>Sem tweets ainda</h3>
+        <p>${currentTab === "feed" ? "Segue utilizadores para ver os seus tweets aqui." : "Sê o primeiro a publicar!"}</p>
+      </div>`;
+          return;
+        }
+
+        list.innerHTML = tweets.map((t) => tweetCardHTML(t)).join("");
+      }
+
+      /* ── COMPOSIÇÃO ── */
+      function onComposeInput() {
+        const val = $("compose-text").value;
+        const rem = 280 - val.length;
+        const cc = $("char-count");
+        cc.textContent = rem;
+        cc.className =
+          "char-counter" + (rem < 20 ? (rem < 0 ? " over" : " warn") : "");
+        $("post-btn").disabled = val.trim().length === 0 || rem < 0;
+      }
+
+      function onImageSelect(e) {
+        const file = e.target.files[0];
+        if (!file) return;
+        selectedImage = file;
+        $("compose-preview-img").src = URL.createObjectURL(file);
+        $("compose-preview").classList.remove("hidden");
+        $("post-btn").disabled = false;
+      }
+
+      function removeImage() {
+        selectedImage = null;
+        $("compose-preview").classList.add("hidden");
+        $("compose-preview-img").src = "";
+        $("image-input").value = "";
+        onComposeInput();
+      }
+
+      async function submitTweet() {
+        const content = $("compose-text").value.trim();
+        if (!content && !selectedImage) return;
+
+        const btn = $("post-btn");
+        btn.disabled = true;
+        btn.textContent = "...";
+
+        let res;
+        if (selectedImage) {
+          const fd = new FormData();
+          fd.append("content", content);
+          fd.append("image", selectedImage);
+          res = await apiFetch("/tweets", { method: "POST", body: fd });
+        } else {
+          res = await apiFetch("/tweets", {
+            method: "POST",
+            body: JSON.stringify({ content }),
+          });
+        }
+
+        btn.textContent = "Publicar";
+
+        if (res && res.ok) {
+          $("compose-text").value = "";
+          removeImage();
+          onComposeInput();
+          showToast("Tweet publicado!");
+          loadTweets();
+        } else {
+          const d = res ? await res.json() : {};
+          showToast(d.message || "Erro ao publicar.");
+          btn.disabled = false;
+        }
+      }
+
+      /* ── PESQUISA LATERAL ── */
+      function onSideSearch(q) {
+        clearTimeout(searchTimer);
+        searchTimer = setTimeout(() => {
+          if (!q.trim()) {
+            loadSuggestions();
+            return;
+          }
+          const filtered = cachedUsers.filter(
+            (u) =>
+              u.username.toLowerCase().includes(q.toLowerCase()) &&
+              u.id !== currentUser?.id,
+          );
+          renderSuggestions(filtered.slice(0, 5));
+        }, 300);
+      }
+
+      /* ── SUGESTÕES ── */
+      async function loadSuggestions() {
+        const res = await apiFetch("/users");
+        if (!res || !res.ok) return;
+        cachedUsers = await res.json();
+        const others = cachedUsers
+          .filter((u) => u.id !== currentUser?.id)
+          .slice(0, 5);
+        renderSuggestions(others);
+      }
+
+      function renderSuggestions(users) {
+        const el = $("suggest-list");
+        if (!users.length) {
+          el.innerHTML =
+            '<p style="padding:12px 16px;color:var(--text2);font-size:14px">Sem sugestões.</p>';
+          return;
+        }
+        el.innerHTML = users
+          .map(
+            (u) => `
       <div class="widget-item">
         <div class="avatar avatar-sm">${avatarLetter(u.username)}</div>
         <div class="widget-item-info">
           <div class="widget-item-name">${escapeHtml(u.username)}</div>
           <div class="widget-item-handle">@${escapeHtml(u.username)}</div>
         </div>
-        <button class="btn btn-follow btn-sm ${u.isFollowing ? 'btn-following' : ''}"
+        <button class="btn btn-follow btn-sm ${u.isFollowing ? "btn-following" : ""}"
                 id="follow-${u.id}"
                 onclick="toggleFollow(${u.id}, this)">
-          ${u.isFollowing ? 'A seguir' : 'Seguir'}
+          ${u.isFollowing ? "A seguir" : "Seguir"}
         </button>
-      </div>`).join('');
-  }
+      </div>`,
+          )
+          .join("");
+      }
 
-  async function toggleFollow(userId, btn) {
-    const following = btn.classList.contains('btn-following');
-    const res = await apiFetch(`/users/${userId}/follow`, { method: following ? 'DELETE' : 'POST' });
-    if (res && res.ok) {
-      btn.classList.toggle('btn-follow',     following);
-      btn.classList.toggle('btn-following', !following);
-      btn.textContent = following ? 'Seguir' : 'A seguir';
-      showToast(following ? 'Deixaste de seguir.' : 'Agora estás a seguir!');
-    }
-  }
+      async function toggleFollow(userId, btn) {
+        const following = btn.classList.contains("btn-following");
+        const res = await apiFetch(`/users/${userId}/follow`, {
+          method: following ? "DELETE" : "POST",
+        });
+        if (res && res.ok) {
+          btn.classList.toggle("btn-follow", following);
+          btn.classList.toggle("btn-following", !following);
+          btn.textContent = following ? "Seguir" : "A seguir";
+          showToast(
+            following ? "Deixaste de seguir." : "Agora estás a seguir!",
+          );
+        }
+      }
 
-  // Enter para publicar (Ctrl+Enter)
-  document.addEventListener('keydown', e => {
-    if (e.key === 'Enter' && e.ctrlKey) submitTweet();
-  });
-</script>
-</body>
-</html>
+      // Enter para publicar (Ctrl+Enter)
+      document.addEventListener("keydown", (e) => {
+        if (e.key === "Enter" && e.ctrlKey) submitTweet();
+      });
+    </script>
+  </body>
+</html> -->

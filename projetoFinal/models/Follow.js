@@ -1,6 +1,43 @@
-const { DataTypes } = require('sequelize');
-const sequelize = require('../config/database');
+// const { DataTypes } = require('sequelize');
+// const sequelize = require('../config/database');
+module.exports = (sequelize, type) => {
+  return sequelize.define(
+    "follows",
+    {
+      id: {
+        type: type.INTEGER,
+        autoIncrement: true,
+        primaryKey: true,
+      },
+      followerId: {
+        type: type.INTEGER,
+        allowNull: false,
+        comment: "Utilizador que segue",
+        references: {
+          model: "users",
+          key: "id",
+        },
+      },
+      followedId: {
+        type: type.INTEGER,
+        allowNull: false,
+        comment: "Utilizador que é seguido",
+        references: {
+          model: "users",
+          key: "id",
+        },
+      },
+    },
+    {
+      tableName: "follows",
+      timestamps: true,
 
+      indexes: [{ unique: true, fields: ["followerId", "followedId"] }],
+    },
+  );
+};
+
+/*
 // Auto-relação em User: um utilizador segue outros utilizadores
 const Follow = sequelize.define('Follow', {
   id: {
@@ -34,5 +71,5 @@ const Follow = sequelize.define('Follow', {
     { unique: true, fields: ['followerId', 'followedId'] },
   ],
 });
-
-module.exports = Follow;
+*/
+// module.exports = Follow;

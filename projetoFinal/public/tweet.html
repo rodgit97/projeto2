@@ -1,5 +1,98 @@
 <!DOCTYPE html>
 <html lang="pt">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Xwitter – Explorar</title>
+    <link rel="stylesheet" href="../css/style.css" />
+  </head>
+  <body>
+    <div class="app-layout">
+      <nav class="sidebar" id="sidebar"></nav>
+
+      < class="feed-panel">
+        <div class="panel-header">
+          <h1>Explorar</h1>
+
+          <!-- CAIXA DE PESQUISA -->
+          <div style="position:relative;flex:1;margin-left:16px">
+            <input
+              type="text"
+              id="search-input"
+              class="search-input"
+              placeholder="Pesquisar por tweets ou utilizadores..."
+            />
+            <svg
+              style=" 
+                position:absolute;
+                top:50%;
+                left:12px;
+                transform:translateY(-50%);
+                width:20px;
+                height:20px;
+                stroke:var(--text3);
+                fill:none;
+                stroke-width:1.5;
+              "
+              viewBox="0 0 24 24"
+            >
+              <circle cx="11" cy="11" r="8" />
+              <line x1="21" y1="21" x2="16.65
+" y2="16.65" />
+            </svg>
+          </div>
+        </div>
+      </main>
+
+      <main class="feed-panel">
+        <div style="padding: 40px 20px; text-align: center; color: var(--text2)">
+          <div class="empty-state">
+            <svg
+              style="
+                width: 60px;
+                height: 60px;
+                margin: 0 auto 12px;
+                stroke: var(--text3);
+                fill: none;
+                stroke-width: 1.5;
+              "
+              viewBox="0 0 24 24"
+            > 
+              <circle cx="11" cy="11" r="8" />
+              <line x1="21" y1="21" x2="16.65" y2="16.65" />  
+            </svg>
+            <h3>Sem resultados</h3>
+            <p>Tenta pesquisar por algo diferente</p>
+          </div>
+        </div>
+      </main> 
+
+      <aside class="right-sidebar">
+        <div style="margin-top:12px">
+          <div class="widget">
+            <div class="widget-header">Quem seguir</div>
+            <div id="suggest-list"><div class="spinner" style="margin:16px auto"></div></div>
+          </div>
+        </div>
+      </aside>
+    </div>
+
+    <div id="toast">
+
+    </div>
+    <script src="../js/app.js"></script>
+    <script>
+      requireAuth();
+      buildSidebar('explore');
+    </script>
+  </body>
+</html>
+
+
+
+
+<!-- <!DOCTYPE html>
+<html lang="pt">
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
@@ -22,10 +115,10 @@
       <h1>Tweet</h1>
     </div>
 
-    <!-- TWEET PRINCIPAL -->
+    // TWEET PRINCIPAL
     <div id="tweet-detail"><div class="spinner"></div></div>
 
-    <!-- CAIXA DE COMENTÁRIO -->
+    // CAIXA DE COMENTÁRIO 
     <div id="comment-box" class="hidden" style="padding:14px 16px;border-bottom:1px solid var(--border)">
       <div style="display:flex;gap:12px">
         <div class="avatar avatar-sm" id="comment-avatar">?</div>
@@ -48,7 +141,7 @@
       </div>
     </div>
 
-    <!-- LISTA DE COMENTÁRIOS -->
+    <!-- LISTA DE COMENTÁRIOS 
     <div id="comments-list"></div>
 
   </main>
@@ -254,4 +347,4 @@
   }
 </script>
 </body>
-</html>
+</html> -->

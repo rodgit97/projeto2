@@ -1,4 +1,215 @@
-<!DOCTYPE html>
+<!doctype html>
+<html lang="pt">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Xwitter – Entrar</title>
+    <link rel="stylesheet" href="../css/style.css" />
+    <style>
+      body {
+        background: var(--bg2);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+      }
+
+      .auth-wrapper {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        width: 100%;
+        max-width: 900px;
+        min-height: 560px;
+        background: var(--bg);
+        border-radius: var(--r);
+        box-shadow: var(--shadow-md);
+        overflow: hidden;
+        border: 1px solid var(--border);
+      }
+
+      /* Lado esquerdo – hero */
+      .auth-hero {
+        background: linear-gradient(145deg, #1d9bf0 0%, #0070c9 100%);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 48px;
+        color: #fff;
+        position: relative;
+        overflow: hidden;
+      }
+      .auth-hero::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(
+          ellipse 70% 60% at 30% 120%,
+          rgba(255, 255, 255, 0.15) 0%,
+          transparent 70%
+        );
+      }
+      .auth-hero-logo {
+        font-size: 80px;
+        font-weight: 900;
+        line-height: 1;
+        position: relative;
+        z-index: 1;
+      }
+      .auth-hero-tagline {
+        font-size: 24px;
+        font-weight: 700;
+        margin-top: 16px;
+        text-align: center;
+        opacity: 0.9;
+        position: relative;
+        z-index: 1;
+        line-height: 1.4;
+      }
+      .auth-hero-sub {
+        font-size: 15px;
+        margin-top: 10px;
+        opacity: 0.75;
+        text-align: center;
+        position: relative;
+        z-index: 1;
+      }
+
+      /* Lado direito – formulário */
+      .auth-panel {
+        padding: 48px 40px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+      }
+      .auth-panel h1 {
+        font-size: 26px;
+        font-weight: 800;
+        margin-bottom: 4px;
+        letter-spacing: -0.4px;
+      }
+      .auth-panel .subtitle {
+        color: var(--text2);
+        font-size: 14px;
+        margin-bottom: 28px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="auth-wrapper">
+      <!-- HERO -->
+      <div class="auth-hero">
+        <div class="auth-hero-logo">X</div>
+        <div class="auth-hero-tagline">O que está a acontecer agora?</div>
+        <div class="auth-hero-sub">Junta-te à conversa.</div>
+      </div>
+
+      <!-- PAINEL -->
+      <div class="auth-panel">
+        <h1>Bem-vindo</h1>
+        <p class="subtitle">Entra na tua conta ou cria uma nova.</p>
+        <!-- TABS -->
+        <div class="auth-tabs">
+          <button
+            class="auth-tab active"
+            id="tab-login"
+            onclick="switchTab('login')"
+          >
+            Entrar
+          </button>
+          <button
+            class="auth-tab"
+            id="tab-register"
+            onclick="switchTab('register')"
+          >
+            Registar
+          </button>
+        </div>
+        <!-- FORMULÁRIO LOGIN -->
+        <div id="form-login">
+          <div class="form-error" id="login-error"></div>
+          <div class="form-group">
+            <label class="form-label">Nome de utilizador</label>
+            <input
+              class="form-input"
+              type="text"
+              id="login-username"
+              placeholder="ex: joao123"
+              autocomplete="username"
+            />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Password</label>
+            <input
+              class="form-input"
+              type="password"
+              id="login-password"
+              placeholder="
+••••••••"
+              autocomplete="current-password"
+            />
+          </div>
+          <button
+            class="btn btn-primary"
+            style="width: 100%; margin-top: 4 px"
+            onclick="handleLogin()"
+          >
+            Entrar
+          </button>
+          <div class="auth-footer">
+            Não tens conta?
+            <a href="#" onclick="switchTab('register')">Regista -te agora</a>
+          </div>
+        </div>
+        <!-- FORMULÁRIO REGISTO -->
+        <div id="form-register" class="hidden">
+          <div class="form-error" id="register-error"></div>
+          <div class="form-group">
+            <label class="form-label">Nome de utilizador</label>
+            <input
+              class="form-input"
+              type="text"
+              id="reg-username"
+              placeholder="ex: joao123"
+            />
+          </div>
+          <div class="form-group">
+            <label class="form-label">E-mail</label>
+            <input
+              class="form-input"
+              type="email"
+              id="reg-email"
+              placeholder=""
+            />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Password</label>
+            <input
+              class="form-input"
+              type="password"
+              id="reg-password"
+              placeholder="
+mínimo 6 caracteres"
+            />
+          </div>
+          <button
+            class="btn btn-primary"
+            style="width: 100%; margin-top: 4px"
+            onclick="handleRegister()"
+          >
+            Criar conta
+          </button>
+          <div class="auth-footer">
+            Já tens conta?
+            <a href="#" onclick="switchTab('login')">Entra aqui</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
+
+<!-- <!DOCTYPE html>
 <html lang="pt">
 <head>
 <meta charset="UTF-8"/>
@@ -132,25 +343,25 @@
 <body>
 
 <div class="auth-wrapper">
-  <!-- HERO -->
+ //HERO 
   <div class="auth-hero">
     <div class="auth-hero-logo">X</div>
     <div class="auth-hero-tagline">O que está a acontecer agora?</div>
     <div class="auth-hero-sub">Junta-te à conversa.</div>
   </div>
 
-  <!-- PAINEL -->
+  // PAINEL 
   <div class="auth-panel">
     <h1>Bem-vindo</h1>
     <p class="subtitle">Entra na tua conta ou cria uma nova.</p>
 
-    <!-- TABS -->
+    // TABS 
     <div class="auth-tabs">
       <button class="auth-tab active" id="tab-login"    onclick="switchTab('login')">Entrar</button>
       <button class="auth-tab"        id="tab-register" onclick="switchTab('register')">Registar</button>
     </div>
 
-    <!-- FORMULÁRIO LOGIN -->
+    // FORMULÁRIO LOGIN 
     <div id="form-login">
       <div class="form-error" id="login-error"></div>
       <div class="form-group">
@@ -169,7 +380,7 @@
       </div>
     </div>
 
-    <!-- FORMULÁRIO REGISTO -->
+   //FORMULÁRIO REGISTO 
     <div id="form-register" class="hidden">
       <div class="form-error" id="register-error"></div>
       <div class="form-group">
@@ -301,4 +512,4 @@
   });
 </script>
 </body>
-</html>
+</html> -->

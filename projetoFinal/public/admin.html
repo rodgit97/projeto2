@@ -1,4 +1,189 @@
-<!doctype html>
+<html lang="pt">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin - Xwitter</title>
+    <link rel="stylesheet" href="../css/style.css" />
+  </head>
+  <body>
+    <div class="admin-panel">
+      <h1>Painel de Administração</h1>
+      <p>
+        Aqui podes gerir os utilizadores, tweets e comentários da plataforma.
+      </p>
+
+      <div class="admin-section">
+        <h2>Utilizadores</h2>
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Nome</th>
+              <th>Handle</th>
+              <th>Ações</th>
+            </tr>
+          </thead>
+          <tbody id="users-table-body">
+            <!-- Utilizadores serão carregados aqui -->
+          </tbody>
+        </table>
+      </div>
+
+      <div class="admin-section">
+        <h2>Tweets</h2>
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Autor</th>
+              <th>Conteúdo</th>
+              <th>Ações</th>
+            </tr>
+          </thead>
+          <tbody id="tweets-table-body">
+            <!-- Tweets serão carregados aqui -->
+          </tbody>
+        </table>
+      </div>
+
+      <div class="admin-section">
+        <h2>Comentários</h2>
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Autor</th>
+              <th>Conteúdo</th>
+              <th>Ações</th>
+            </tr>
+          </thead>
+          <tbody id="comments-table-body">
+            <!-- Comentários serão carregados aqui -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <script src="../js/app.js"></script>
+    <script>
+      requireAuth();
+      if (currentUser.role !== "admin") {
+        alert(
+          "Acesso negado. Apenas administradores podem aceder a esta página.",
+        );
+        window.location.href = "feed.html";
+      }
+
+      // Funções para carregar dados e gerir ações de admin
+      async function loadAdminData() {
+        await Promise.all([loadUsers(), loadTweets(), loadComments()]);
+      }
+
+      async function loadUsers() {
+        const res = await apiFetch("/admin/users");
+        if (!res || !res.ok) return;
+        const users = await res.json();
+        const tbody = $("users-table-body");
+        tbody.innerHTML = users
+          .map(
+            (u) => `
+          <tr>
+            <td>${u.id}</td>
+            <td>${u.username}</td>
+            <td>@${u.username}</td>
+            <td><button class="btn btn-sm btn-danger" onclick="deleteUser(${u.id})">Eliminar</button></td>
+          </tr>
+        `,
+          )
+          .join("");
+      }
+
+      async function loadTweets() {
+        const res = await apiFetch("/admin/tweets");
+        if (!res || !res.ok) return;
+        const tweets = await res.json();
+        const tbody = $("tweets-table-body");
+        tbody.innerHTML = tweets
+          .map(
+            (t) => `
+          <tr>
+            <td>${t.id}</td>
+            <td>${t.User?.username || "desconecido"}</td>
+            <td>${t.content}</td>
+            <td><button class="btn btn-sm btn-danger" onclick="deleteTweet(${t.id})">Eliminar</button></td>
+          </tr>
+        `,
+          )
+          .join("");
+      }
+
+      async function loadComments() {
+        const res = await apiFetch("/admin/comments");
+        if (!res || !res.ok) return;
+        const comments = await res.json();
+        const tbody = $("comments-table-body");
+        tbody.innerHTML = comments
+          .map(
+            (c) => `
+          <tr>
+            <td>${c.id}</td>
+            <td>${c.User?.username || "desconecido"}</td>
+            <td>${c.content}</td>
+            <td><button class="btn btn-sm btn-danger" onclick="deleteComment(${c.id})">Eliminar</button></td>
+          </tr>
+        `,
+          )
+          .join("");
+      }
+
+      async function deleteUser(userId) {
+        if (!confirm("Tens a certeza que queres eliminar este utilizador?"))
+          return;
+        const res = await apiFetch(`/admin/users/${userId}`, {
+          method: "DELETE",
+        });
+        if (res && res.ok) {
+          showToast("Utilizador eliminado com sucesso");
+          loadUsers();
+        } else {
+          showToast("Erro ao eliminar utilizador", true);
+        }
+      }
+
+      async function deleteTweet(tweetId) {
+        if (!confirm("Tens a certeza que queres eliminar este tweet?")) return;
+        const res = await apiFetch(`/admin/tweets/${tweetId}`, {
+          method: "DELETE",
+        });
+        if (res && res.ok) {
+          showToast("Tweet eliminado com sucesso");
+          loadTweets();
+        } else {
+          showToast("Erro ao eliminar tweet", true);
+        }
+      }
+
+      async function deleteComment(commentId) {
+        if (!confirm("Tens a certeza que queres eliminar este comentário?"))
+          return;
+        const res = await apiFetch(`/admin/comments/${commentId}`, {
+          method: "DELETE",
+        });
+        if (res && res.ok) {
+          showToast("Comentário eliminado com sucesso");
+          loadComments();
+        } else {
+          showToast("Erro ao eliminar comentário", true);
+        }
+      }
+
+      loadAdminData();
+    </script>
+  </body>
+
+</html>
+
+<!-- <!doctype html>
 <html lang="pt">
   <head>
     <meta charset="UTF-8" />
@@ -103,7 +288,7 @@
             Gestão de utilizadores e tweets da plataforma.
           </p>
 
-          <!-- ESTATÍSTICAS -->
+          //STATÍSTICAS 
           <div class="stats-grid">
             <div class="stat-card">
               <div class="stat-card-label">Total utilizadores</div>
@@ -119,25 +304,25 @@
             </div>
           </div>
 
-          <!-- TABS -->
+          //ABS 
           <div class="admin-tabs">
             <button
               class="admin-tab active"
               id="tab-users"
               onclick="switchTab('users')"
             >
-              👤 Utilizadores
+               Utilizadores
             </button>
             <button
               class="admin-tab"
               id="tab-tweets"
               onclick="switchTab('tweets')"
             >
-              🐦 Tweets
+               Tweets
             </button>
           </div>
 
-          <!-- TOOLBAR -->
+         //TOOLBAR
           <div class="table-toolbar">
             <div class="search-wrap" style="flex: 1; max-width: 320px">
               <svg
@@ -164,14 +349,14 @@
             ></span>
           </div>
 
-          <!-- TABELA -->
+          // TABELA 
           <div class="table-wrap">
             <div id="admin-content"><div class="spinner"></div></div>
           </div>
         </div>
       </main>
 
-      <!-- MODAL EDITAR UTILIZADOR -->
+      // MODAL EDITAR UTILIZADOR 
       <div
         class="modal-overlay hidden"
         id="edit-user-modal"
@@ -218,7 +403,7 @@
         </div>
       </div>
 
-      <!-- MODAL EDITAR TWEET -->
+      // MODAL EDITAR TWEET
       <div
         class="modal-overlay hidden"
         id="edit-tweet-modal"
@@ -274,7 +459,7 @@
             "
           >
             <button class="btn btn-outline btn-sm" onclick="loadData()">
-              🔄 Atualizar dados
+               Atualizar dados
             </button>
             <button
               class="btn btn-outline btn-sm"
@@ -301,7 +486,7 @@
       loadStats();
       loadData();
 
-      /* ── ESTATÍSTICAS ── */
+      //  ── ESTATÍSTICAS ── 
       async function loadStats() {
         const [uRes, tRes] = await Promise.all([
           apiFetch("/admin/users"),
@@ -327,7 +512,7 @@
         }
       }
 
-      /* ── TABS ── */
+      //  ── TABS ── 
       function switchTab(tab) {
         currentTab = tab;
         $("tab-users").classList.toggle("active", tab === "users");
@@ -336,14 +521,14 @@
         renderTable(tab === "users" ? allUsers : allTweets);
       }
 
-      /* ── CARREGAR DADOS ── */
+      //  ── CARREGAR DADOS ── 
       async function loadData() {
         $("admin-content").innerHTML = '<div class="spinner"></div>';
         await loadStats();
         renderTable(currentTab === "users" ? allUsers : allTweets);
       }
 
-      /* ── FILTRO ── */
+      //  ── FILTRO ── 
       function filterTable(q) {
         const data = currentTab === "users" ? allUsers : allTweets;
         const filtered = q.trim()
@@ -354,7 +539,7 @@
         renderTable(filtered);
       }
 
-      /* ── RENDER ── */
+      //  ── RENDER ── 
       function renderTable(data) {
         $("table-count").textContent =
           `${data.length} resultado${data.length !== 1 ? "s" : ""}`;
@@ -549,4 +734,4 @@
       }
     </script>
   </body>
-</html>
+</html> -->

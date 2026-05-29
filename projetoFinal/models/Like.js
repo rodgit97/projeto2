@@ -1,6 +1,47 @@
-const { DataTypes } = require('sequelize');
-const sequelize = require('../config/database');
+// const { DataTypes } = require('sequelize');
+// const sequelize = require('../config/database');
+module.exports = (sequelize, type) => {
+  return sequelize.define(
+    "likes",
+    {
+      id: {
+        type: type.INTEGER,
+        autoIncrement: true,
+        primaryKey: true,
+      },
+      userId: {
+        type: type.INTEGER,
+        allowNull: false,
+        references: {
+          model: "users",
+          key: "id",
+        },
+      },
+      tweetId: {
+        type: type.INTEGER,
+        allowNull: false,
+        references: {
+          model: "tweets",
+          key: "id",
+        },
+      },
+    },
+    {
+      tableName: "likes",
+      timestamps: true,
+      // Um utilizador só pode dar like uma vez no mesmo tweet
+      indexes: [{ unique: true, fields: ["userId", "tweetId"] }],
+    },
+    {
+      tableName: "likes",
+      timestamps: true,
+      // Um utilizador só pode dar like uma vez no mesmo tweet
+      indexes: [{ unique: true, fields: ["userId", "tweetId"] }],
+    },
+  );
+};
 
+/*
 // Tabela de junção para os likes
 // Relação MUITOS-PARA-MUITOS entre User e Tweet
 const Like = sequelize.define('Like', {
@@ -33,5 +74,6 @@ const Like = sequelize.define('Like', {
     { unique: true, fields: ['userId', 'tweetId'] },
   ],
 });
+*/
 
-module.exports = Like;
+// module.exports = Like;
