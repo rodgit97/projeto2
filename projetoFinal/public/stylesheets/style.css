@@ -1,1 +1,260 @@
-/*  */
+/* =========================================
+   VARIÁVEIS & TEMA
+   ========================================= */
+:root {
+  --bg-primary: #ffffff;
+  --bg-secondary: #f7f9f9;
+  --text-primary: #0f1419;
+  --text-secondary: #536471;
+  --accent: #1d9bf0;
+  --accent-hover: #1a8cd8;
+  --border: #eff3f4;
+  --danger: #f4212e;
+  --success: #00ba7c;
+  --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --radius: 16px;
+  --shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+/* =========================================
+   RESET & GLOBAL
+   ========================================= */
+*, *::before, *::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: var(--font);
+  background-color: var(--bg-secondary);
+  color: var(--text-primary);
+  line-height: 1.5;
+}
+
+a { text-decoration: none; color: inherit; }
+button { cursor: pointer; border: none; font-family: inherit; }
+input, textarea { font-family: inherit; }
+
+/* =========================================
+   LAYOUT PRINCIPAL (3 colunas estilo Twitter)
+   ========================================= */
+.app-layout {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 275px 1fr 350px;
+  gap: 1rem;
+  min-height: 100vh;
+  padding: 0 1rem;
+}
+
+/* Sidebar Esquerda */
+.sidebar-left {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  padding: 1rem 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.nav-menu { list-style: none; }
+.nav-item {
+  padding: 0.8rem 1rem;
+  border-radius: 999px;
+  font-size: 1.2rem;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  margin-bottom: 0.5rem;
+  transition: background 0.2s;
+}
+.nav-item:hover { background: var(--bg-secondary); }
+.nav-item.active { background: var(--accent); color: #fff; }
+
+.btn-tweet {
+  background: var(--accent);
+  color: #fff;
+  padding: 0.9rem 2rem;
+  border-radius: 999px;
+  font-weight: bold;
+  width: 100%;
+  margin-top: 1rem;
+  transition: background 0.2s;
+}
+.btn-tweet:hover { background: var(--accent-hover); }
+
+/* Feed Central */
+.feed {
+  background: var(--bg-primary);
+  border-radius: var(--radius);
+  border-left: 1px solid var(--border);
+  border-right: 1px solid var(--border);
+  min-height: 100vh;
+}
+
+.feed-header {
+  padding: 1rem;
+  border-bottom: 1px solid var(--border);
+  font-weight: bold;
+  font-size: 1.2rem;
+  position: sticky;
+  top: 0;
+  background: var(--bg-primary);
+  z-index: 10;
+}
+
+.tweet-composer {
+  padding: 1rem;
+  border-bottom: 1px solid var(--border);
+}
+.tweet-composer textarea {
+  width: 100%;
+  border: none;
+  resize: none;
+  font-size: 1.1rem;
+  outline: none;
+  min-height: 60px;
+  padding: 0.5rem 0;
+}
+.composer-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 0.5rem;
+}
+
+/* Tweet Card */
+.tweet {
+  padding: 1rem;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  gap: 0.8rem;
+  transition: background 0.15s;
+  cursor: pointer;
+}
+.tweet:hover { background: var(--bg-secondary); }
+
+.tweet__avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: var(--border);
+  flex-shrink: 0;
+  object-fit: cover;
+}
+
+.tweet__content { flex: 1; }
+.tweet__header { display: flex; gap: 0.5rem; margin-bottom: 0.3rem; flex-wrap: wrap; }
+.tweet__name { font-weight: bold; }
+.tweet__handle, .tweet__time { color: var(--text-secondary); font-size: 0.9rem; }
+.tweet__text { margin-bottom: 0.5rem; word-break: break-word; white-space: pre-wrap; }
+
+.tweet__image {
+  width: 100%;
+  border-radius: var(--radius);
+  margin-top: 0.5rem;
+  max-height: 400px;
+  object-fit: cover;
+}
+
+.tweet__actions {
+  display: flex;
+  justify-content: space-between;
+  max-width: 80%;
+  margin-top: 0.5rem;
+  color: var(--text-secondary);
+}
+.tweet__action {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+.tweet__action:hover { color: var(--accent); }
+.tweet__action.liked { color: var(--danger); }
+
+/* Sidebar Direita (Trends/Sugestões) */
+.sidebar-right {
+  padding: 1rem 0;
+}
+.widget {
+  background: var(--bg-primary);
+  border-radius: var(--radius);
+  padding: 1rem;
+  margin-bottom: 1rem;
+  border: 1px solid var(--border);
+}
+.widget h3 { margin-bottom: 0.8rem; font-size: 1.1rem; }
+
+/* =========================================
+   FORMULÁRIOS (Login/Registo)
+   ========================================= */
+.auth-container {
+  max-width: 400px;
+  margin: 4rem auto;
+  background: var(--bg-primary);
+  padding: 2rem;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  text-align: center;
+}
+.auth-title { margin-bottom: 1.5rem; color: var(--accent); font-size: 1.5rem; }
+
+.form-group { margin-bottom: 1rem; text-align: left; }
+.form-label { display: block; margin-bottom: 0.4rem; font-weight: 500; font-size: 0.9rem; }
+.form-input {
+  width: 100%;
+  padding: 0.8rem;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-size: 1rem;
+  transition: border 0.2s;
+}
+.form-input:focus { border-color: var(--accent); outline: none; }
+
+.btn-primary {
+  width: 100%;
+  background: var(--accent);
+  color: #fff;
+  padding: 0.8rem;
+  border-radius: 8px;
+  font-weight: bold;
+  font-size: 1rem;
+  margin-top: 0.5rem;
+  /* transition: background 0.2s; */
+}
+.btn-primary:hover { background: var(--accent-hover); }
+
+.auth-footer { margin-top: 1rem; font-size: 0.9rem; color: var(--text-secondary); }
+.auth-footer a { color: var(--accent); }
+
+/* =========================================
+   UTILITÁRIOS & RESPONSIVO
+   ========================================= */
+.text-center { text-align: center; }
+.mt-1 { margin-top: 0.5rem; }
+.mt-2 { margin-top: 1rem; }
+.hidden { display: none; }
+.error-msg { color: var(--danger); font-size: 0.85rem; margin-top: 0.3rem; }
+
+/* Tablet */
+@media (max-width: 992px) {
+  .app-layout { grid-template-columns: 80px 1fr; }
+  .sidebar-right { display: none; }
+  .nav-item span { display: none; } /* Esconde texto, fica só ícone */
+  .btn-tweet { padding: 0.8rem; font-size: 0; width: 48px; height: 48px; border-radius: 50%; }
+  .btn-tweet::before { content: "✏️"; font-size: 1.2rem; }
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+  .app-layout { grid-template-columns: 1fr; padding: 0; }
+  .sidebar-left { display: none; }
+  .feed { border-radius: 0; border: none; }
+  .auth-container { margin: 1rem; padding: 1.5rem; }
+}

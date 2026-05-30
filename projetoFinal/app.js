@@ -1,5 +1,4 @@
-require("./public/stylesheets/style.css");
-var createError = require("http-errors");
+var createError = require("http-errors"); 
 var express = require("express");
 var path = require("path");
 var cookieParser = require("cookie-parser");
@@ -11,9 +10,9 @@ require("dotenv").config();
 var indexRouter = require("./routes/index");
 var usersRouter = require("./routes/users");
 //--------------------------------
-var authRouter = require("./routes/auth");
+// var authRouter = require("./routes/auth");
 var tweetRouter = require("./routes/tweet");
-var userRouter = require("./routes/user");
+// var userRouter = require("./routes/user");
 const adminRouter = require("./routes/admin");
 
 //-------------------------------
@@ -38,9 +37,10 @@ app.use(express.static(path.join(__dirname, "public")));
 app.use("/", indexRouter);
 app.use("/users", usersRouter);
 //-------------------------------
-app.use("/auth", authRouter);
+// app.use("/auth", authRouter);
+
 app.use("/tweet", tweetRouter);
-app.use("/user", userRouter);
+// app.use("/user", userRouter);
 // app.use("/admin");
 // app.use("/users");
 //--------------------------------

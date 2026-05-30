@@ -2,14 +2,14 @@
 
 // const fs = require('fs');
 // const path = require('path');
-const Sequelize = require("sequelize");
+const {DataTypes} = require("sequelize");
 const sequelize = require("../config/database");
 
-const User = require("./User");
-const Profile = require("./Profile");
-const Tweet = require("./Tweet");
-const Like = require("./Like");
-const Follow = require("./Follow");
+const User = require("./User")(sequelize, DataTypes);
+const Profile = require("./Profile")(sequelize, DataTypes);
+const Tweet = require("./Tweet")(sequelize, DataTypes);
+const Like = require("./Like")(sequelize, DataTypes);
+const Follow = require("./Follow")(sequelize, DataTypes);
 
 // const User = require("./models/User");
 // const Profile = require("./models/Profile");
@@ -58,7 +58,6 @@ module.exports = {
   Like,
   Follow,
   sequelize,
-  Sequelize,
 };
 // const process = require('process');
 // const basename = path.basename(__filename);

@@ -2,7 +2,7 @@ var express = require('express');
 var router = express.Router();
 
 router.get('/', function(req, res, next) {
-  res.render('index', { title: 'PEOJETO FINAL TWITTER CLONE' });
+  res.render('index', { title: 'PROJETO FINAL TWITTER CLONE' });
 });
 
 router.get('/home', function(req, res, next) {

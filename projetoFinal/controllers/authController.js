@@ -70,8 +70,19 @@ const login = async (req, res) => {
   }
 };
 
+const me = async (req,res) => {
+  try {
+    const user = await User.findById(req.user.id);
+    return res.status(200).json(user);
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ message: "Erro ao fazer login." });
+  }
+};
+
 // POST /auth/logout
 const logout = (req, res) =>
+  
   res.status(200).json({ message: "daida da conta efeituada." });
 
-module.exports = { signup, login, logout };
+module.exports = { signup, login, logout, me };
