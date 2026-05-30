@@ -70,7 +70,7 @@ const login = async (req, res) => {
   }
 };
 
-const me = async (req,res) => {
+const me = async (req, res) => {
   try {
     const user = await User.findById(req.user.id);
     return res.status(200).json(user);
@@ -81,8 +81,7 @@ const me = async (req,res) => {
 };
 
 // POST /auth/logout
-const logout = (req, res) =>
-  
+const logout = (req, res) => {
   res.status(200).json({ message: "daida da conta efeituada." });
-
+};
 module.exports = { signup, login, logout, me };
