@@ -1,10 +1,11 @@
-require("../middleware/authMiddleware");
+// const { Profile } = require("../models");
 // const { User } = require("../models");
+
+require("../middleware/authMiddleware");
 require("dotenv").config();
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const { User, Profile } = require("../models");
-// const { Profile } = require("../models");
 
 const signup = async (req, res) => {
   try {

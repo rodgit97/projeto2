@@ -1,10 +1,11 @@
-require("../models/User");
-const { User , Comment, Tweet, Like, Follow, Profile} = require("../models");
 // const { Comment } = require("../models");
 // const { Tweet } = require("../models");
 // const { Like } = require("../models");
 // const { Follow } = require("../models");
 // const { Profile } = require("../models");
+
+require("../models/User");
+const { User , Comment, Tweet, Like, Follow, Profile} = require("../models");
 
 const getUsers = async (req, res) => {
   try {

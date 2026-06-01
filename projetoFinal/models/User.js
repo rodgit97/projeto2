@@ -47,8 +47,6 @@ module.exports = (sequelize, type) => {
   );
 };
 
-
-
 /*
 const User = sequelize.define('User', {
   id: {

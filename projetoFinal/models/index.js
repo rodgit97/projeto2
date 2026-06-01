@@ -2,7 +2,15 @@
 
 // const fs = require('fs');
 // const path = require('path');
-const {DataTypes} = require("sequelize");
+
+// const User = require("./models/User");
+// const Profile = require("./models/Profile");
+// const Tweet = require("./models/Tweet");
+// const Like = require("./models");
+// const Follow = require("./Follow");
+
+//index.js
+const { DataTypes } = require("sequelize");
 const sequelize = require("../config/database");
 
 const User = require("./User")(sequelize, DataTypes);
@@ -10,12 +18,6 @@ const Profile = require("./Profile")(sequelize, DataTypes);
 const Tweet = require("./Tweet")(sequelize, DataTypes);
 const Like = require("./Like")(sequelize, DataTypes);
 const Follow = require("./Follow")(sequelize, DataTypes);
-
-// const User = require("./models/User");
-// const Profile = require("./models/Profile");
-// const Tweet = require("./models/Tweet");
-// const Like = require("./models");
-// const Follow = require("./Follow");
 
 User.hasOne(Profile, { foreignKey: "userId", as: "profile" });
 Profile.belongsTo(User, { foreignKey: "userId", as: "user" });

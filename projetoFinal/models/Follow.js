@@ -73,3 +73,4 @@ const Follow = sequelize.define('Follow', {
 });
 */
 // module.exports = Follow;
+//vamo ignorar

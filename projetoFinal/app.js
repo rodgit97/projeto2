@@ -1,4 +1,4 @@
-var createError = require("http-errors"); 
+var createError = require("http-errors");
 var express = require("express");
 var path = require("path");
 var cookieParser = require("cookie-parser");
@@ -39,15 +39,18 @@ app.use("/users", usersRouter);
 //-------------------------------
 // app.use("/auth", authRouter);
 
-app.use("/tweet", tweetRouter);
+app.use("/tweets", tweetRouter);
 // app.use("/user", userRouter);
 // app.use("/admin");
 // app.use("/users");
 //--------------------------------
 // catch 404 and forward to error handler
-app.use(function (req, res, next) {
-  next(createError(404));
-});
+// app.use(function (req, res, next) {
+//   next(createError(404));
+// });
+
+app.use("/admin", adminRouter);
+
 
 // error handler
 app.use(function (err, req, res, next) {
