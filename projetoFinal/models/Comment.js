@@ -34,6 +34,7 @@ module.exports = (sequelize, type) => {
   });
 };
 
+
 // // Relação UM-PARA-MUITOS: Tweet tem muitos Comments
 // const Comment = sequelize.define('Comment', {
 //   id: {

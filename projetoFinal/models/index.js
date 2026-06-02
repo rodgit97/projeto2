@@ -60,6 +60,11 @@ Like.belongsTo(Tweet, { foreignKey: "tweetId", as: "tweet" });
 Follow.belongsTo(User, { foreignKey: "followerId", as: "follower" });
 Follow.belongsTo(User, { foreignKey: "followedId", as: "followed" });
 
+// Um utilizador pode fazer muitos comentários
+User.hasMany(Comment, { foreignKey: "userId", as: "user" });
+
+// Um comentário pertence a um único utilizador
+Comment.belongsTo(User, { foreignKey: "userId", as: "user" });
 module.exports = {
   User,
   Profile,
