@@ -4,7 +4,8 @@ const authController = require("../controllers/authController");
 const authMiddleware = require("../middleware/authMiddleware");
 const userController = require("../controllers/userController");
 const tweetController = require("../controllers/tweetController");
-// const adminMiddleware = require("../middleware/authMiddleware");
+const adminController = require('../controllers/adminController');
+
 router.post("/signup", authController.signup);
 
 router.post("/login", authController.login);
@@ -18,8 +19,8 @@ router.put("/:id", authMiddleware, userController.updateProfile);
 router.delete("/:id", authMiddleware, userController.unfollow);
 
 router.get("/", tweetController.getAllTweets);
-router.put("/:id", tweetController.getAllTweets);
-router.get("/:id", tweetController.getAllTweets);
+router.put("/:id", tweetController.updateTweet);
+router.delete("/:id", tweetController.deleteTweet);
 
 
 

@@ -66,6 +66,7 @@ app.use("/api/admin", adminRouter);
 // app.use("/api/like", likeRouter);
 // app.use("/api/comments", commentsRouter);
 app.use("/api/feed", feedRouter);
+app.use("/api/like", likeRouter);
 
 // error handler
 app.use(function (err, req, res, next) {
