@@ -15,7 +15,7 @@ var tweetRouter = require("./routes/tweet");
 var adminRouter = require("./routes/admin");
 //-------------------------------
 var authRouter = require("./routes/lixo/auth");
-// var commentsRouter = require("./routes/comments");
+var commentsRouter = require("./routes/comment");
 var feedRouter = require("./routes/feed");
 var likeRouter = require("./routes/like");
 //-------------------------------
@@ -63,7 +63,7 @@ app.use("/like", likeRouter);
 // });
 
 
-// app.use("/comments", commentsRouter);
+app.use("/comments", commentsRouter);
 //-------------------------------
 app.use("/api/users", usersRouter);
 app.use("/api/tweets", tweetRouter);

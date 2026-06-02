@@ -5,12 +5,9 @@ const feedController = require("../controllers/feedController");
 
 router.get("/", authMiddleware, feedController.getFeed);
 
-router.get("/likes", authMiddleware, feedController.getLikedTweets);
+router.get("/feedlikes", authMiddleware, feedController.getLikedTweets);
 
-router.get("/comments", authMiddleware, feedController.getCommentedTweets);
+router.get("/feedcomments", authMiddleware, feedController.getCommentedTweets);
 
-router.post("/likes/:tweetId", authMiddleware, feedController.getTweetLikes);
-
-router.delete("/comments/:tweetId", authMiddleware, feedController.getTweetComments);
-
+router.post("/feedlikes", feedController.getLikedTweets)
 module.exports = router;

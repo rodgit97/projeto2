@@ -39,11 +39,11 @@ router.get("/follow/:id", authMiddleware, userController.follow);
 router.delete("/follow/:id", authMiddleware, userController.unfollow);
 //----------------------------------
 
-router.post("/", authMiddleware, commentController.createComment);
-router.get("/:id", commentController.getCommentsByTweetId);
-router.delete("/:id", authMiddleware, commentController.deleteComment);
-router.get("/", commentController.getAllComments);
-router.put("/:id", authMiddleware, commentController.updateComment);
+router.post("/comments", authMiddleware, commentController.createComment);
+router.get("/comments/:id", commentController.getCommentsByTweetId);
+router.delete("/comments/:id", authMiddleware, commentController.deleteComment);
+router.get("/comments", commentController.getAllComments);
+router.put("/comments/:id", authMiddleware, commentController.updateComment);
 // router.get("auth/", authMiddleware, authController.login);
 // router.get("/:id", userController.show);
 // router.post("/login", authMiddleware, authController.login);
