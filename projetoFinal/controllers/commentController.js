@@ -1,5 +1,6 @@
-require("../models/Comment");
+// require("../models/Comment");
 const { Comment, User } = require("../models");
+const { Op } = require("sequelize");
 
 const getCommentsByTweetId = async (req, res) => {
   const { id } = req.params;
@@ -205,7 +206,7 @@ const updateCommentAdmin = async (req, res) => {
 };
 
 ///----------------------
-
+/*
 exports.getCommentsByTweetId = async (req, res) => {
   const { tweetId } = req.params;
   try {
@@ -411,3 +412,11 @@ exports.updateCommentAdmin = async (req, res) => {
     res.status(500).json({ error: "Erro ao atualizar comentário" });
   }
 };
+*/
+module.exports={
+  createComment,
+  getCommentsByTweetId,
+  deleteComment,
+  getAllComments,
+  updateComment,
+}
