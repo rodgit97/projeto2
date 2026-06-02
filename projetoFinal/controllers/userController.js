@@ -37,7 +37,7 @@ const index = async (req, res) => {
 
 const show = async (req, res) => {
   try {
-    const user = await User.findByPk(req.params.id, {
+    const user = await User.findById(req.params.id, {
       attributes: ["id", "username", "email", "role", "createdAt"],
       include: [{ model: Profile, as: "Profile" }],
     });
@@ -194,7 +194,7 @@ const unfollow = async (req, res) => {
 
 const deleteUser = async (req, res) => {
   try {
-    const user = await User.findByPk(req.params.id);
+    const user = await User.findById(req.params.id);
     if (!user)
       return res.status(404).json({ error: "Utilizador não encontrado" });
     await user.destroy();

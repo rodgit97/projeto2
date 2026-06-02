@@ -50,9 +50,7 @@ app.use("/tweets", tweetRouter);
 app.use("/feed", feedRouter);
 
 app.use("/like", likeRouter);
-
-
-
+////
 // app.use("/user", userRouter);
 // app.use("/admin");
 // app.use("/users");
@@ -61,8 +59,7 @@ app.use("/like", likeRouter);
 // app.use(function (req, res, next) {
 //   next(createError(404));
 // });
-
-
+/////
 app.use("/comments", commentsRouter);
 //-------------------------------
 app.use("/api/users", usersRouter);

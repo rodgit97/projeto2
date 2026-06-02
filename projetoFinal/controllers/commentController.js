@@ -16,11 +16,35 @@ const getCommentsByTweetId = async (req, res) => {
     res.status(500).json({ error: "Erro ao obter comentários" });
   }
 };
+const createComment = async (req, res) => {
+  const { content } = req.body;
+  const { id } = req.params; // Este é o tweetId
+  
+  const userId = req.user.id; 
+  
+  try {
+    if (!content || content.trim() === "") {
+      return res.status(400).json({ error: "O conteúdo do comentário não pode ser vazio" });
+    }
 
+    // Verifica se o userId foi capturado corretamente
+    if (!userId) {
+       return res.status(401).json({ error: "Usuário não autenticado ou ID não encontrado no token." });
+    }
+
+    const newComment = await Comment.create({ content, tweetId: id, userId });
+    res.status(201).json(newComment);
+    
+  } catch (error) {
+    console.error("Erro ao criar comentário:", error);
+    res.status(500).json({ error: "Erro ao criar comentário" });
+  }
+};
+/*
 const createComment = async (req, res) => {
   const { content } = req.body;
   const { id } = req.params;
-  const userId = req.session.userId;
+  const userId = req.body.id;
   if (!content || content.trim() === "") {
     return res
       .status(400)
@@ -34,12 +58,13 @@ const createComment = async (req, res) => {
     res.status(500).json({ error: "Erro ao criar comentário" });
   }
 };
+*/
 
 const deleteComment = async (req, res) => {
   const { id } = req.params;
   const userId = req.session.userId;
   try {
-    const comment = await Comment.findByPk(id);
+    const comment = await Comment.find(id);
     if (!comment) {
       return res.status(404).json({ error: "Comentário não encontrado" });
     }
@@ -413,10 +438,10 @@ exports.updateCommentAdmin = async (req, res) => {
   }
 };
 */
-module.exports={
+module.exports = {
   createComment,
   getCommentsByTweetId,
   deleteComment,
   getAllComments,
   updateComment,
-}
+};
