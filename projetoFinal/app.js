@@ -14,7 +14,7 @@ var usersRouter = require("./routes/users");
 var tweetRouter = require("./routes/tweet");
 var adminRouter = require("./routes/admin");
 //-------------------------------
-var authRouter = require("./routes/lixo/auth");
+var authRouter = require("./routes/auth");
 var commentsRouter = require("./routes/comment");
 var feedRouter = require("./routes/feed");
 var likeRouter = require("./routes/like");
@@ -50,7 +50,7 @@ app.use("/tweets", tweetRouter);
 app.use("/feed", feedRouter);
 
 app.use("/like", likeRouter);
-////
+
 // app.use("/user", userRouter);
 // app.use("/admin");
 // app.use("/users");
@@ -59,7 +59,12 @@ app.use("/like", likeRouter);
 // app.use(function (req, res, next) {
 //   next(createError(404));
 // });
-/////
+// 1. Importar os modelos
+const models = require('./models');
+
+// 2. Importar o ficheiro que faz as ligações (SE você tiver um)
+
+
 app.use("/comments", commentsRouter);
 //-------------------------------
 app.use("/api/users", usersRouter);

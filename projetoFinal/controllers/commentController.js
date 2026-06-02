@@ -1,7 +1,7 @@
 // require("../models/Comment");
 const { Comment, User } = require("../models");
 const { Op } = require("sequelize");
-
+/*
 const getCommentsByTweetId = async (req, res) => {
   const { id } = req.params;
   try {
@@ -16,25 +16,44 @@ const getCommentsByTweetId = async (req, res) => {
     res.status(500).json({ error: "Erro ao obter comentários" });
   }
 };
+*/
+const getCommentsByTweetId = async (req, res) => {
+  const { id } = req.params;
+  try {
+    const comments = await Comment.findAll({
+      where: { tweetId: id },
+      include: [{ model: User, attributes: ["username"], as: "user" }], // Adicionado o 'as'
+      order: [["createdAt", "ASC"]],
+    });
+    res.json(comments);
+  } catch (error) {
+    console.error("Erro ao obter comentários:", error);
+    res.status(500).json({ error: "Erro ao obter comentários" });
+  }
+};
+
 const createComment = async (req, res) => {
   const { content } = req.body;
   const { id } = req.params; // Este é o tweetId
-  
-  const userId = req.user.id; 
-  
+
+  const userId = req.user.id;
+
   try {
     if (!content || content.trim() === "") {
-      return res.status(400).json({ error: "O conteúdo do comentário não pode ser vazio" });
+      return res
+        .status(400)
+        .json({ error: "O conteúdo do comentário não pode ser vazio" });
     }
 
     // Verifica se o userId foi capturado corretamente
     if (!userId) {
-       return res.status(401).json({ error: "Usuário não autenticado ou ID não encontrado no token." });
+      return res.status(401).json({
+        error: "Usuário não autenticado ou ID não encontrado no token.",
+      });
     }
 
     const newComment = await Comment.create({ content, tweetId: id, userId });
     res.status(201).json(newComment);
-    
   } catch (error) {
     console.error("Erro ao criar comentário:", error);
     res.status(500).json({ error: "Erro ao criar comentário" });
@@ -59,7 +78,7 @@ const createComment = async (req, res) => {
   }
 };
 */
-
+/*
 const deleteComment = async (req, res) => {
   const { id } = req.params;
   const userId = req.session.userId;
@@ -80,11 +99,38 @@ const deleteComment = async (req, res) => {
     res.status(500).json({ error: "Erro ao deletar comentário" });
   }
 };
+*/
+const deleteComment = async (req, res) => {
+  const { id } = req.params;
 
+  // ✅ CORRETO: O middleware definiu req.user, não req.session
+  const userId = req.user.id;
+
+  try {
+    // ✅ CORRETO: findByPk é o método do Sequelize para buscar pela Primary Key (ID)
+    const comment = await Comment.findByPk(id);
+
+    if (!comment) {
+      return res.status(404).json({ error: "Comentário não encontrado" });
+    }
+
+    if (comment.userId !== userId) {
+      return res
+        .status(403)
+        .json({ error: "Apenas o autor do comentário pode deletá-lo" });
+    }
+
+    await comment.destroy();
+    res.json({ message: "Comentário deletado com sucesso" });
+  } catch (error) {
+    console.error("Erro ao deletar comentário:", error);
+    res.status(500).json({ error: "Erro ao deletar comentário" });
+  }
+};
 const getAllComments = async (req, res) => {
   try {
     const comments = await Comment.findAll({
-      include: [{ model: User, attributes: ["username"] }],
+      // include: [{ model: User, attributes: ["username"] }],
       order: [["createdAt", "DESC"]],
     });
     const result = comments.map((c) => {
