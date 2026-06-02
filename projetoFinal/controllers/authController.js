@@ -83,6 +83,14 @@ const me = async (req, res) => {
 
 // POST /auth/logout
 const logout = (req, res) => {
-  res.status(200).json({ message: "daida da conta efeituada." });
+  try {
+    // Para JWT, o logout é gerido a nível de cliente (remover token).
+    // Opcionalmente, poderias implementar uma blacklist de tokens no servidor para invalidar tokens antes do prazo de expiração.
+    return res.status(200).json({ message: "Logout efetuado com sucesso." });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ message: "Erro ao fazer logout." });
+  }
+  // res.status(200).json({ message: "daida da conta efeituada." });
 };
 module.exports = { signup, login, logout, me };

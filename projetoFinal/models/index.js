@@ -18,12 +18,17 @@ const Profile = require("./Profile")(sequelize, DataTypes);
 const Tweet = require("./Tweet")(sequelize, DataTypes);
 const Like = require("./Like")(sequelize, DataTypes);
 const Follow = require("./Follow")(sequelize, DataTypes);
+const Comment = require("./Comment")(sequelize, DataTypes);
 
 User.hasOne(Profile, { foreignKey: "userId", as: "profile" });
 Profile.belongsTo(User, { foreignKey: "userId", as: "user" });
 
 User.hasMany(Tweet, { foreignKey: "userId", as: "tweets" });
 Tweet.belongsTo(User, { foreignKey: "userId", as: "author" });
+
+Tweet.hasMany(Comment, { foreignKey: "tweetId", as: "comments" });
+Comment.belongsTo(Tweet, { foreignKey: "tweetId", as: "tweet" });
+
 
 User.belongsToMany(Tweet, {
   through: Like,
