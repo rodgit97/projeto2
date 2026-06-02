@@ -3,6 +3,7 @@ var router = express.Router();
 const authController = require("../controllers/authController");
 const authMiddleware = require("../middleware/authMiddleware");
 const userController = require("../controllers/userController");
+const likeController = require("../controllers/likeController")
 // const adminMiddleware = require("../middleware/adminMiddleware");
 
 router.post("/signup", authController.signup);
@@ -36,8 +37,13 @@ router.get("/follow/:id", authMiddleware, userController.follow);
 
 router.delete("/follow/:id", authMiddleware, userController.unfollow);
 //----------------------------------
-// router.get("/:id", userController.show);
 
+// router.get("auth/", authMiddleware, authController.login);
+// router.get("/:id", userController.show);
+// router.post("/login", authMiddleware, authController.login);
+
+router.post("/signup", authController.signup);
+router.post("/signin", authController.login); 
 // router.post("/", userController.show);
 
 // router.get("/users", userController.index);

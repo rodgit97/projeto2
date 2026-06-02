@@ -14,7 +14,7 @@ var usersRouter = require("./routes/users");
 var tweetRouter = require("./routes/tweet");
 var adminRouter = require("./routes/admin");
 //-------------------------------
-// var authRouter = require("./routes/auth");
+var authRouter = require("./routes/lixo/auth");
 // var commentsRouter = require("./routes/comments");
 var feedRouter = require("./routes/feed");
 var likeRouter = require("./routes/like");
@@ -42,9 +42,17 @@ app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerFile));
 app.use("/", indexRouter);
 app.use("/users", usersRouter);
 //-------------------------------
-// app.use("/auth", authRouter);
+app.use("/auth", authRouter);
+app.use("/admin", adminRouter);
 
 app.use("/tweets", tweetRouter);
+
+app.use("/feed", feedRouter);
+
+app.use("/like", likeRouter);
+
+
+
 // app.use("/user", userRouter);
 // app.use("/admin");
 // app.use("/users");
@@ -54,11 +62,8 @@ app.use("/tweets", tweetRouter);
 //   next(createError(404));
 // });
 
-app.use("/admin", adminRouter);
 
-app.use("/feed", feedRouter);
 // app.use("/comments", commentsRouter);
-app.use("/like", likeRouter);
 //-------------------------------
 app.use("/api/users", usersRouter);
 app.use("/api/tweets", tweetRouter);

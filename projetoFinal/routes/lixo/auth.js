@@ -6,4 +6,6 @@ router.get('/auth', function(req, res, next) {
   res.send('precisa de autenticação');
 });
 
+
+
 module.exports = router;
