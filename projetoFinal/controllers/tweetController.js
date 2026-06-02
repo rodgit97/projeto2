@@ -32,9 +32,10 @@ exports.getAllTweets = async (req, res) => {
 const getTweetById = async (req, res) => {
   try {
     const { id } = req.params;
-    const tweet = await Tweet.findByPk(id, {
+    const tweet = await Tweet.findById(id, {
       // include: [{ model: User, attributes: ["username"] }],
       // order: [["createdAt", "DESC"]],
+
     });
     if (!tweet)      return res.status(404).json({ message: "Tweet não encontrado" });
     res.json(tweet);

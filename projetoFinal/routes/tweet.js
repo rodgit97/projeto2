@@ -6,19 +6,20 @@ const authController = require("../controllers/authController");
 const likeController = require("../controllers/likeController");
 const commentController = require("../controllers/commentController");
 
+
 router.get("/", tweetController.getAllTweets);
 router.get("/:id", tweetController.getTweetById);
 router.post("/", authMiddleware, tweetController.createTweet);
 router.put("/:id", authMiddleware, tweetController.updateTweet);
 router.delete("/:id", authMiddleware, tweetController.deleteTweet);
 
-router.post("/:id/comments", authMiddleware, commentController.createComment);
-router.get(
-  "/:id/comments",
-  authMiddleware,
-  commentController.getCommentsByTweetId,
-);
-router.delete("/:id", authMiddleware, commentController.deleteComment);
+// router.post("/:id/comments", authMiddleware, commentController.createComment);
+// router.get(
+//   "/:id/comments",
+//   authMiddleware,
+//   commentController.getCommentsByTweetId,
+// );
+// router.delete("/:id", authMiddleware, commentController.deleteComment);
 
 
 

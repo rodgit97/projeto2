@@ -17,9 +17,13 @@ router.post("/logout", authController.logout);
 //--------------------------------------------
 router.get("/search", userController.index);
 
-router.get("/:id", userController.show);
+router.get("/:id", userController.show); //one user
 
-router.get("/", userController.index);
+router.get("/", userController.index); //more users
+
+router.put("/:id", authMiddleware, userController.updateProfile);
+
+router. delete("/:id", authMiddleware, userController.deleteUser)
 
 //-----------------------------------------------
 router.get("/getusertweets", userController.getUserTweets);

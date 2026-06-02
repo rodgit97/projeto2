@@ -190,6 +190,20 @@ const unfollow = async (req, res) => {
   }
 };
 
+
+
+const deleteUser = async (req, res) => {
+  try {
+    const user = await User.findByPk(req.params.id);
+    if (!user)
+      return res.status(404).json({ error: "Utilizador não encontrado" });
+    await user.destroy();
+    return res.status(200).json({ message: "Utilizador deletado com sucesso" });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ error: "Erro ao deletar utilizador" });
+  }
+};
 // const deleteUser =async
 module.exports = {
   index,
@@ -199,4 +213,5 @@ module.exports = {
   updateProfile,
   follow,
   unfollow,
+  deleteUser,
 };
