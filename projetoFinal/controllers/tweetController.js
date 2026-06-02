@@ -5,7 +5,7 @@ const { Op } = require("sequelize");
 const getAllTweets = async (req, res) => {
   try {
     const tweets = await Tweet.findAll({
-      include: [{ model: User, attributes: ["username"] }],
+      // include: [{ model: User, attributes: ["username"] }],
       order: [["createdAt", "DESC"]],
     });
     res.json(tweets);

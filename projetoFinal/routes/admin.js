@@ -5,6 +5,7 @@ const authMiddleware = require("../middleware/authMiddleware");
 const userController = require("../controllers/userController");
 const tweetController = require("../controllers/tweetController");
 const adminController = require('../controllers/adminController');
+const adminMiddleware = require("../middleware/adminMiddleware");
 
 router.post("/signup", authController.signup);
 

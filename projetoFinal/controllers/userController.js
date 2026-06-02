@@ -155,7 +155,7 @@ const follow = async (req, res) => {
         .status(400)
         .json({ message: "Não podes seguir-te a ti mesmo." });
 
-    const target = await User.findByPk(followedId);
+    const target = await User.findById(followedId);
     if (!target)
       return res.status(404).json({ message: "Utilizador não encontrado." });
 

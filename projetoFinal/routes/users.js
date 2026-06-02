@@ -34,7 +34,7 @@ router.put("/profile", authMiddleware, userController.updateProfile);
 router.put("/profile/:id", authMiddleware, userController.updateProfile);
 //-------------------------------------------
 
-router.get("/follow/:id", authMiddleware, userController.follow);
+router.post("/follow/:id", authMiddleware, userController.follow);
 
 router.delete("/follow/:id", authMiddleware, userController.unfollow);
 //----------------------------------
@@ -50,6 +50,7 @@ router.put("/comments/:id", authMiddleware, commentController.updateComment);
 
 router.post("/signup", authController.signup);
 router.post("/signin", authController.login);
+
 // router.post("/", userController.show);
 
 // router.get("/users", userController.index);
