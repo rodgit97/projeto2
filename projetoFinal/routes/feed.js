@@ -9,5 +9,5 @@ router.get("/feedlikes", authMiddleware, feedController.getLikedTweets);
 
 router.get("/feedcomments", authMiddleware, feedController.getCommentedTweets);
 
-router.post("/feedlikes", feedController.getLikedTweets)
+router.post("/feedlikes", feedController.getLikedTweets);
 module.exports = router;

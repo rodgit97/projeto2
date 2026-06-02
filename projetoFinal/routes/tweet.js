@@ -23,8 +23,8 @@ router.delete("/:id", authMiddleware, tweetController.deleteTweet);
 
 
 
-router.post("/:id/like", authMiddleware, likeController.likeTweet);
-router.delete("/:id/like", authMiddleware, likeController.unlikeTweet);
+// router.post("/:id/like", authMiddleware, likeController.likeTweet);
+// router.delete("/:id/like", authMiddleware, likeController.unlikeTweet);
 
 // router.delete("/tweet/:id", function (req, res, next) {
 

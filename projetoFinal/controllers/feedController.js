@@ -2,7 +2,9 @@
 // require("../models/Follow");
 // const { Like, Tweet, Follow, User } = require("../models");
 
-const { Tweet, User, Follow, Like, Comment } = require("../models");
+// const { Tweet, User, Follow, Like, Comment } = require("../models");
+const { Tweet, User, Like } = require("../models");
+
 const { Op } = require("sequelize");
 
 // const getFeed = async (req, res) => {
@@ -251,6 +253,8 @@ const getLikedTweets = async (req, res) => {
     const likedTweets = likes.map((l) => l.tweet);
     return res.status(200).json({ likedTweets });
   } catch (err) {
+    console.error("Erro ao obter tweets liked:", err);
+
     return res.status(500).json({ error: "Erro ao obter tweets liked." });
   }
 };
@@ -271,6 +275,8 @@ const getCommentedTweets = async (req, res) => {
     const commentedTweets = comments.map((c) => c.tweet);
     return res.status(200).json({ commentedTweets });
   } catch (err) {
+    console.error("Erro real ao obter tweets comentados:", err); // ⬅️ ADICIONE ISTO
+
     return res.status(500).json({ error: "Erro ao obter tweets comentados." });
   }
 };
@@ -290,15 +296,10 @@ const getTweetLikes = async (req, res) => {
   }
 };
 
-const getTweetComments = async (req, res) => {
-  
-};
-
 module.exports = {
   getFeed,
   getLikedTweets,
   getCommentedTweets,
   getTweetLikes,
-  getTweetComments,
 };
 // module.exports = { getFeed, getLikedTweets, getCommentedTweets, getTweetLikes ,getTweetComments};

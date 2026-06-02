@@ -28,13 +28,13 @@ module.exports = (sequelize, type) => {
     },
     {
       tableName: "likes",
-      timestamps: true,
+      timestamps: false,
       // Um utilizador só pode dar like uma vez no mesmo tweet
       indexes: [{ unique: true, fields: ["userId", "tweetId"] }],
     },
     {
       tableName: "likes",
-      timestamps: true,
+      timestamps: false,
       // Um utilizador só pode dar like uma vez no mesmo tweet
       indexes: [{ unique: true, fields: ["userId", "tweetId"] }],
     },
